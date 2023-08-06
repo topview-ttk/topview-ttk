@@ -110,6 +110,7 @@ var User_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	SsoService_SendPhoneVerificationCode_FullMethodName = "/user.SsoService/SendPhoneVerificationCode"
+	SsoService_PhoneVerifyCodeLogin_FullMethodName      = "/user.SsoService/PhoneVerifyCodeLogin"
 )
 
 // SsoServiceClient is the client API for SsoService service.
@@ -117,6 +118,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SsoServiceClient interface {
 	SendPhoneVerificationCode(ctx context.Context, in *SendPhoneVerificationCodeRequest, opts ...grpc.CallOption) (*SendPhoneVerificationCodeResponse, error)
+	PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*PhoneVerifyCodeLoginResponse, error)
 }
 
 type ssoServiceClient struct {
@@ -136,11 +138,21 @@ func (c *ssoServiceClient) SendPhoneVerificationCode(ctx context.Context, in *Se
 	return out, nil
 }
 
+func (c *ssoServiceClient) PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*PhoneVerifyCodeLoginResponse, error) {
+	out := new(PhoneVerifyCodeLoginResponse)
+	err := c.cc.Invoke(ctx, SsoService_PhoneVerifyCodeLogin_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SsoServiceServer is the server API for SsoService service.
 // All implementations must embed UnimplementedSsoServiceServer
 // for forward compatibility
 type SsoServiceServer interface {
 	SendPhoneVerificationCode(context.Context, *SendPhoneVerificationCodeRequest) (*SendPhoneVerificationCodeResponse, error)
+	PhoneVerifyCodeLogin(context.Context, *PhoneVerifyCodeLoginRequest) (*PhoneVerifyCodeLoginResponse, error)
 	mustEmbedUnimplementedSsoServiceServer()
 }
 
@@ -150,6 +162,9 @@ type UnimplementedSsoServiceServer struct {
 
 func (UnimplementedSsoServiceServer) SendPhoneVerificationCode(context.Context, *SendPhoneVerificationCodeRequest) (*SendPhoneVerificationCodeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendPhoneVerificationCode not implemented")
+}
+func (UnimplementedSsoServiceServer) PhoneVerifyCodeLogin(context.Context, *PhoneVerifyCodeLoginRequest) (*PhoneVerifyCodeLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PhoneVerifyCodeLogin not implemented")
 }
 func (UnimplementedSsoServiceServer) mustEmbedUnimplementedSsoServiceServer() {}
 
@@ -182,6 +197,24 @@ func _SsoService_SendPhoneVerificationCode_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SsoService_PhoneVerifyCodeLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PhoneVerifyCodeLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SsoServiceServer).PhoneVerifyCodeLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SsoService_PhoneVerifyCodeLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SsoServiceServer).PhoneVerifyCodeLogin(ctx, req.(*PhoneVerifyCodeLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SsoService_ServiceDesc is the grpc.ServiceDesc for SsoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -192,6 +225,10 @@ var SsoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendPhoneVerificationCode",
 			Handler:    _SsoService_SendPhoneVerificationCode_Handler,
+		},
+		{
+			MethodName: "PhoneVerifyCodeLogin",
+			Handler:    _SsoService_PhoneVerifyCodeLogin_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

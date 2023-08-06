@@ -13,13 +13,17 @@ import (
 )
 
 type (
+	PhoneVerifyCodeLoginRequest       = user.PhoneVerifyCodeLoginRequest
+	PhoneVerifyCodeLoginResponse      = user.PhoneVerifyCodeLoginResponse
 	Request                           = user.Request
 	Response                          = user.Response
 	SendPhoneVerificationCodeRequest  = user.SendPhoneVerificationCodeRequest
 	SendPhoneVerificationCodeResponse = user.SendPhoneVerificationCodeResponse
+	UserInfo                          = user.UserInfo
 
 	SsoService interface {
 		SendPhoneVerificationCode(ctx context.Context, in *SendPhoneVerificationCodeRequest, opts ...grpc.CallOption) (*SendPhoneVerificationCodeResponse, error)
+		PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*PhoneVerifyCodeLoginResponse, error)
 	}
 
 	defaultSsoService struct {
@@ -36,4 +40,9 @@ func NewSsoService(cli zrpc.Client) SsoService {
 func (m *defaultSsoService) SendPhoneVerificationCode(ctx context.Context, in *SendPhoneVerificationCodeRequest, opts ...grpc.CallOption) (*SendPhoneVerificationCodeResponse, error) {
 	client := user.NewSsoServiceClient(m.cli.Conn())
 	return client.SendPhoneVerificationCode(ctx, in, opts...)
+}
+
+func (m *defaultSsoService) PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*PhoneVerifyCodeLoginResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.PhoneVerifyCodeLogin(ctx, in, opts...)
 }

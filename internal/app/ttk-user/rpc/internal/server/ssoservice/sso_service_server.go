@@ -26,3 +26,8 @@ func (s *SsoServiceServer) SendPhoneVerificationCode(ctx context.Context, in *us
 	l := ssoservicelogic.NewSendPhoneVerificationCodeLogic(ctx, s.svcCtx)
 	return l.SendPhoneVerificationCode(in)
 }
+
+func (s *SsoServiceServer) PhoneVerifyCodeLogin(ctx context.Context, in *user.PhoneVerifyCodeLoginRequest) (*user.PhoneVerifyCodeLoginResponse, error) {
+	l := ssoservicelogic.NewPhoneVerifyCodeLoginLogic(ctx, s.svcCtx)
+	return l.PhoneVerifyCodeLogin(in)
+}

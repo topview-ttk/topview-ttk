@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package user;
-option go_package="./user";
+option go_package = "./user";
 
 message Request {
   string ping = 1;
@@ -11,6 +11,11 @@ message Response {
   string pong = 1;
 }
 
+message UserInfo{
+  int64 id  = 1;
+  string user_name = 2;
+  string nick_name = 3;
+}
 
 service User {
   rpc Ping(Request) returns(Response);
@@ -19,11 +24,10 @@ service User {
 
 message SendPhoneVerificationCodeRequest {
   string phone = 1;
-  int64 timestamp = 2;
   // 设备信息
-  string device_info = 3;
+  string device_info = 2;
   // 客户端版本
-  string client_info = 4;
+  string client_info = 3;
 }
 
 // 发送验证码响应
@@ -32,6 +36,21 @@ message SendPhoneVerificationCodeResponse {
   string message = 2;
 }
 
+message PhoneVerifyCodeLoginRequest {
+  string phone = 1;
+  string verification_code = 2;
+  // 设备信息
+  string device_info = 3;
+  // 客户端版本
+  string client_info = 4;
+}
+message PhoneVerifyCodeLoginResponse {
+  int32 status_code = 1;
+  string message = 2;
+  UserInfo user_info = 3;
+}
+
 service SsoService{
   rpc SendPhoneVerificationCode(SendPhoneVerificationCodeRequest) returns (SendPhoneVerificationCodeResponse);
+  rpc PhoneVerifyCodeLogin(PhoneVerifyCodeLoginRequest) returns (PhoneVerifyCodeLoginResponse);
 }

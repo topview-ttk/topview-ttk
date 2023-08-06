@@ -13,10 +13,13 @@ import (
 )
 
 type (
+	PhoneVerifyCodeLoginRequest       = user.PhoneVerifyCodeLoginRequest
+	PhoneVerifyCodeLoginResponse      = user.PhoneVerifyCodeLoginResponse
 	Request                           = user.Request
 	Response                          = user.Response
 	SendPhoneVerificationCodeRequest  = user.SendPhoneVerificationCodeRequest
 	SendPhoneVerificationCodeResponse = user.SendPhoneVerificationCodeResponse
+	UserInfo                          = user.UserInfo
 
 	User interface {
 		Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)

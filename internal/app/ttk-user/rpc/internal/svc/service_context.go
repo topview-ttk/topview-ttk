@@ -3,7 +3,6 @@ package svc
 import (
 	"github.com/redis/go-redis/v9"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
-	"gorm.io/gorm"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/config"
 	"topview-ttk/internal/app/ttk-user/rpc/model"
 	"topview-ttk/internal/pkg/common"
@@ -12,7 +11,6 @@ import (
 type ServiceContext struct {
 	Config                    config.Config
 	Rdb                       *redis.Client
-	DbEngine                  *gorm.DB
 	TtkUserInfoModel          model.TtkUserInfoModel
 	TtkAuthorizationModel     model.TtkAuthorizationModel
 	TtkThirdPartyBindingModel model.TtkThirdPartyBindingModel
@@ -25,12 +23,14 @@ type ServiceContext struct {
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	sqlConn := sqlx.NewMysql(c.Mysql.DataSource)
-	db := common.InitGorm(c.Mysql.DataSource)
+	db, err := common.InitGorm(c.Mysql.DataSource).DB()
+	if err != nil {
+		panic(err)
+	}
+	sqlConn := sqlx.NewSqlConnFromDB(db)
 	rdb := common.InitRedis(c.BizRedis.Host, c.BizRedis.Pass, c.BizRedis.DB)
 	return &ServiceContext{
 		Config:                    c,
-		DbEngine:                  db,
 		Rdb:                       rdb,
 		TtkUserInfoModel:          model.NewTtkUserInfoModel(sqlConn, c.CacheRedis),
 		TtkAuthorizationModel:     model.NewTtkAuthorizationModel(sqlConn, c.CacheRedis),
