@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/redis/go-redis/v9"
 	"math/rand"
-	"regexp"
 	"time"
+	"topview-ttk/internal/app/ttk-user/rpc/internal/util"
 
 	"topview-ttk/internal/app/ttk-user/rpc/internal/svc"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
@@ -28,7 +28,7 @@ func NewSendPhoneVerificationCodeLogic(ctx context.Context, svcCtx *svc.ServiceC
 }
 
 func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(in *user.SendPhoneVerificationCodeRequest) (*user.SendPhoneVerificationCodeResponse, error) {
-	isValid := validatePhoneNumber(in.GetPhone())
+	isValid := util.ValidatePhoneNumber(in.GetPhone())
 
 	if !isValid {
 		return &user.SendPhoneVerificationCodeResponse{
@@ -112,11 +112,4 @@ func storeVerificationCode(ctx context.Context, client *redis.Client, phoneNumbe
 	if err != nil {
 		logx.Error("Error storing verification code: %v", err)
 	}
-}
-
-func validatePhoneNumber(phoneNumber string) bool {
-	// 使用正则表达式验证中国手机号码
-	pattern := `^1[3-9]\d{9}$`
-	regex := regexp.MustCompile(pattern)
-	return regex.MatchString(phoneNumber)
 }
