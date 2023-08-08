@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	openapi "github.com/alibabacloud-go/darabonba-openapi/v2/client"
-	util "github.com/alibabacloud-go/tea-utils/v2/service"
+	teautil "github.com/alibabacloud-go/tea-utils/v2/service"
 	"github.com/redis/go-redis/v9"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
@@ -12,7 +12,7 @@ import (
 	sms "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sms/v20190711"
 	"math/rand"
 	"time"
-	//"topview-ttk/internal/app/ttk-user/rpc/internal/util"
+	"topview-ttk/internal/app/ttk-user/rpc/internal/util"
 
 	dysmsapi20170525 "github.com/alibabacloud-go/dysmsapi-20170525/v3/client"
 	"github.com/alibabacloud-go/tea/tea"
@@ -38,14 +38,14 @@ func NewSendPhoneVerificationCodeLogic(ctx context.Context, svcCtx *svc.ServiceC
 }
 
 func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(in *user.SendPhoneVerificationCodeRequest) (*user.SendPhoneVerificationCodeResponse, error) {
-	//isValid := util.ValidatePhoneNumber(in.GetPhone())
+	isValid := util.ValidatePhoneNumber(in.GetPhone())
 
-	//if !isValid {
-	//	return &user.SendPhoneVerificationCodeResponse{
-	//		StatusCode: 1,
-	//		Message:    "请输入正确的手机号码，当前手机号码不合法",
-	//	}, nil
-	//}
+	if !isValid {
+		return &user.SendPhoneVerificationCodeResponse{
+			StatusCode: 1,
+			Message:    "请输入正确的手机号码，当前手机号码不合法",
+		}, nil
+	}
 
 	if !canSendVerificationCode(l.ctx, l.svcCtx.Rdb, in.GetPhone()) {
 		return &user.SendPhoneVerificationCodeResponse{
@@ -57,9 +57,7 @@ func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(in *user.Send
 	code := generateVerificationCode()
 	storeVerificationCode(l.ctx, l.svcCtx.Rdb, in.GetPhone(), code, 5*time.Minute)
 	err := aliyunSMS(in.GetPhone(), code)
-	logx.Info("111")
 	if err != nil {
-		logx.Info("222")
 		logx.Error(err)
 	}
 	return &user.SendPhoneVerificationCodeResponse{
@@ -194,12 +192,12 @@ func aliyunSMS(phoneNumber, verifyCode string) (_err error) {
 	}
 
 	sendSmsRequest := &dysmsapi20170525.SendSmsRequest{
-		SignName:      tea.String("阿里云短信测试"),
-		TemplateCode:  tea.String("SMS_154950909"),
-		PhoneNumbers:  tea.String("18928700000"),
-		TemplateParam: tea.String("{\"code\":\"1234\"}"),
+		SignName:      tea.String("verifylearn"),
+		TemplateCode:  tea.String("SMS_462460518"),
+		PhoneNumbers:  tea.String(phoneNumber),
+		TemplateParam: tea.String(fmt.Sprintf("{\"code\":\"%s\"}", verifyCode)),
 	}
-	runtime := &util.RuntimeOptions{}
+	runtime := &teautil.RuntimeOptions{}
 	tryErr := func() (_e error) {
 		defer func() {
 			if r := tea.Recover(recover()); r != nil {
@@ -207,7 +205,9 @@ func aliyunSMS(phoneNumber, verifyCode string) (_err error) {
 			}
 		}()
 		// 复制代码运行请自行打印 API 的返回值
-		_, _err = client.SendSmsWithOptions(sendSmsRequest, runtime)
+		r, _err := client.SendSmsWithOptions(sendSmsRequest, runtime)
+		// 阿里云sms比较不好的一点，管方sdk也不说，由这里判断是否发送成功
+		logx.Info(r)
 		if _err != nil {
 			return _err
 		}
@@ -222,12 +222,10 @@ func aliyunSMS(phoneNumber, verifyCode string) (_err error) {
 		} else {
 			error.Message = tea.String(tryErr.Error())
 		}
-		logx.
-			Error(tryErr.Error())
+		logx.Error(tryErr.Error())
 		// 如有需要，请打印 error
-		_, _err = util.AssertAsString(error.Message)
+		_, _err = teautil.AssertAsString(error.Message)
 		if _err != nil {
-			fmt.Println(_err)
 			return _err
 		}
 	}
