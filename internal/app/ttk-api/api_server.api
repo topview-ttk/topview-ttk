@@ -1,0 +1,40 @@
+syntax = "v1"
+
+type SendPhoneVerificationCodeRequest {
+	Phone       string `json:"phone"`
+	Device_info string `json:"device_info"`
+	Client_info string `json:"client_info"`
+}
+
+type SendPhoneVerificationCodeResponse {
+	Status_code int32  `json:"status_code"`
+	Message     string `json:"message"`
+}
+
+type PhoneVerifyCodeLoginRequest {
+	Phone             string `json:"phone"`
+	Verification_code string `json:"verification_code"`
+	Device_info       string `json:"device_info"`
+	Client_info       string `json:"client_info"`
+}
+
+type PhoneVerifyCodeLoginResponse {
+	Status_code int32    `json:"status_code"`
+	Message     string   `json:"message"`
+	User_info   UserInfo `json:"user_info"`
+}
+
+type UserInfo {
+}
+
+@server(
+	prefix: /v1
+	group: user
+)
+service api_server {
+	@handler SendPhoneVerificationCode
+	post /sso/sendPhoneVerificationCode (SendPhoneVerificationCodeRequest) returns (SendPhoneVerificationCodeResponse)
+
+	@handler PhoneVerifyCodeLogin
+	post /sso/phoneVerifyCodeLogin (PhoneVerifyCodeLoginRequest) returns (PhoneVerifyCodeLoginResponse)
+}

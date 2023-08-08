@@ -1,0 +1,43 @@
+package user
+
+import (
+	"context"
+	"topview-ttk/internal/app/ttk-user/rpc/user"
+
+	"topview-ttk/internal/app/ttk-api/internal/svc"
+	"topview-ttk/internal/app/ttk-api/internal/types"
+
+	"github.com/zeromicro/go-zero/core/logx"
+)
+
+type SendPhoneVerificationCodeLogic struct {
+	logx.Logger
+	ctx    context.Context
+	svcCtx *svc.ServiceContext
+}
+
+func NewSendPhoneVerificationCodeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SendPhoneVerificationCodeLogic {
+	return &SendPhoneVerificationCodeLogic{
+		Logger: logx.WithContext(ctx),
+		ctx:    ctx,
+		svcCtx: svcCtx,
+	}
+}
+
+func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(req *types.SendPhoneVerificationCodeRequest) (resp *types.SendPhoneVerificationCodeResponse, err error) {
+	rpcResp, err := l.svcCtx.SsoClient.SendPhoneVerificationCode(l.ctx, &user.SendPhoneVerificationCodeRequest{
+		Phone:      req.Phone,
+		DeviceInfo: req.Device_info,
+		ClientInfo: req.Client_info,
+	})
+
+	if err != nil {
+		logx.Error(err)
+		return &types.SendPhoneVerificationCodeResponse{}, err
+	}
+
+	return &types.SendPhoneVerificationCodeResponse{
+		Status_code: rpcResp.StatusCode,
+		Message:     rpcResp.Message,
+	}, err
+}
