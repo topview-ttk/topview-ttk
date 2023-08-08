@@ -34,25 +34,16 @@ func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(in *user.PhoneVerifyCod
 	isValid := util.ValidatePhoneNumber(in.GetPhone())
 
 	if !isValid {
-		return &user.PhoneVerifyCodeLoginResponse{
-			StatusCode: 1,
-			Message:    "请输入正确的手机号码，当前手机号码不合法",
-		}, nil
+		return handleLoginError("请输入正确的手机号码，当前手机号码不合法"), nil
 	}
 
 	code, err := l.svcCtx.Rdb.Get(l.ctx, "verification:"+in.GetPhone()).Result()
 	if err != nil {
-		return &user.PhoneVerifyCodeLoginResponse{
-			StatusCode: 1,
-			Message:    "系统繁忙或者验证码不存在，请重新发送验证码",
-		}, err
+		return handleLoginError("系统繁忙或者验证码不存在，请重新发送验证码"), err
 	}
 
 	if code != in.GetVerificationCode() {
-		return &user.PhoneVerifyCodeLoginResponse{
-			StatusCode: 1,
-			Message:    "验证码错误，请核实短信验证码是否正确",
-		}, nil
+		return handleLoginError("验证码错误，请核实短信验证码是否正确"), nil
 	}
 	userInfo, err := l.svcCtx.TtkUserInfoModel.FindOneByPhone(l.ctx, in.GetPhone())
 	if err != nil && errors.Is(err, sqlc.ErrNotFound) {
@@ -68,23 +59,31 @@ func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(in *user.PhoneVerifyCod
 		r, err := l.svcCtx.TtkUserInfoModel.Insert(l.ctx, userInfo)
 		if err != nil {
 			logx.Error(err)
+			return handleLoginError("网络繁忙，请重试尝试登录"), err
 		} else if a, _ := r.RowsAffected(); a != 1 {
-			logx.Error(errors.New("数据库插入失败"))
+			err = errors.New("数据库插入失败")
+			logx.Error(err)
+			return handleLoginError("网络繁忙，请重试尝试登录"), err
 		}
-		return &user.PhoneVerifyCodeLoginResponse{
-			StatusCode: 0,
-			Message:    "登录成功，正在加载",
-			UserInfo: &user.UserInfo{
-				Id:       userInfo.Id,
-				UserName: userInfo.TtkId,
-				NickName: userInfo.NickName.String,
-			},
-		}, nil
+	} else if err != nil {
+		logx.Error(err)
+		return handleLoginError("网络繁忙，请重试尝试登录"), err
 	}
 
 	return &user.PhoneVerifyCodeLoginResponse{
-		StatusCode: 1,
-		Message:    "网络繁忙，请重试尝试登录",
+		StatusCode: 0,
+		Message:    "登录成功，正在加载",
+		UserInfo: &user.UserInfo{
+			Id:       userInfo.Id,
+			UserName: userInfo.TtkId,
+			NickName: userInfo.NickName.String,
+		},
 	}, nil
+}
 
+func handleLoginError(message string) *user.PhoneVerifyCodeLoginResponse {
+	return &user.PhoneVerifyCodeLoginResponse{
+		StatusCode: 1,
+		Message:    message,
+	}
 }
