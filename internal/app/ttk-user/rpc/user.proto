@@ -17,7 +17,7 @@ message UserInfo{
   string nick_name = 3;
 }
 
-service User {
+service UserService {
   rpc Ping(Request) returns(Response);
 }
 
@@ -50,7 +50,39 @@ message PhoneVerifyCodeLoginResponse {
   UserInfo user_info = 3;
 }
 
+message SendEmailVerificationCodeRequest {
+  string email = 1;
+  // 设备信息
+  string device_info = 2;
+  // 客户端版本
+  string client_info = 3;
+}
+
+// 发送验证码响应
+message SendEmailVerificationCodeResponse {
+  int32 status_code = 1;
+  string message = 2;
+}
+
+message EmailVerifyCodeLoginRequest {
+  string email = 1;
+  string verification_code = 2;
+  // 设备信息
+  string device_info = 3;
+  // 客户端版本
+  string client_info = 4;
+}
+message EmailVerifyCodeLoginResponse {
+  int32 status_code = 1;
+  string message = 2;
+  UserInfo user_info = 3;
+}
+
 service SsoService{
   rpc SendPhoneVerificationCode(SendPhoneVerificationCodeRequest) returns (SendPhoneVerificationCodeResponse);
   rpc PhoneVerifyCodeLogin(PhoneVerifyCodeLoginRequest) returns (PhoneVerifyCodeLoginResponse);
+
+  rpc SendEmailVerificationCode(SendEmailVerificationCodeRequest) returns (SendEmailVerificationCodeResponse);
+  rpc EmailVerifyCodeLogin(EmailVerifyCodeLoginRequest) returns (EmailVerifyCodeLoginResponse);
 }
+

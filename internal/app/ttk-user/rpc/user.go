@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	ssoserver "topview-ttk/internal/app/ttk-user/rpc/internal/server/ssoservice"
-	userserver "topview-ttk/internal/app/ttk-user/rpc/internal/server/user"
+	userserver "topview-ttk/internal/app/ttk-user/rpc/internal/server/userservice"
 
 	"topview-ttk/internal/app/ttk-user/rpc/internal/config"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/svc"
@@ -27,7 +27,7 @@ func main() {
 	ctx := svc.NewServiceContext(c)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
-		user.RegisterUserServer(grpcServer, userserver.NewUserServer(ctx))
+		user.RegisterUserServiceServer(grpcServer, userserver.NewUserServiceServer(ctx))
 		user.RegisterSsoServiceServer(grpcServer, ssoserver.NewSsoServiceServer(ctx))
 		if c.Mode == service.DevMode || c.Mode == service.TestMode {
 			reflection.Register(grpcServer)

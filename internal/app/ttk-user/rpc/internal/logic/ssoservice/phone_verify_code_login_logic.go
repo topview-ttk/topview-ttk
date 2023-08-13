@@ -5,12 +5,9 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
-	"math/rand"
-	"strconv"
-	"time"
+	"topview-ttk/internal/app/ttk-user/rpc/internal/logic/ssoservice/login"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/svc"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/util"
-	"topview-ttk/internal/app/ttk-user/rpc/model"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
 
 	"github.com/zeromicro/go-zero/core/logx"
@@ -34,40 +31,34 @@ func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(in *user.PhoneVerifyCod
 	isValid := util.ValidatePhoneNumber(in.GetPhone())
 
 	if !isValid {
-		return handleLoginError("请输入正确的手机号码，当前手机号码不合法"), nil
+		return handlePhoneLoginError("请输入正确的手机号码，当前手机号码不合法"), nil
 	}
 
 	code, err := l.svcCtx.Rdb.Get(l.ctx, "verification:"+in.GetPhone()).Result()
 	if err != nil {
-		return handleLoginError("系统繁忙或者验证码不存在，请重新发送验证码"), err
+		return handlePhoneLoginError("系统繁忙或者验证码不存在，请重新发送验证码"), err
 	}
 
 	if code != in.GetVerificationCode() {
-		return handleLoginError("验证码错误，请核实短信验证码是否正确"), nil
+		return handlePhoneLoginError("验证码错误，请核实短信验证码是否正确"), nil
 	}
 	userInfo, err := l.svcCtx.TtkUserInfoModel.FindOneByPhone(l.ctx, in.GetPhone())
 	if err != nil && errors.Is(err, sqlc.ErrNotFound) {
 		// todo 后续添加随机ttk_id机制，或许求hash？
-		i := rand.Int63()
-		userInfo = &model.TtkUserInfo{
-			Id:        i,
-			Phone:     sql.NullString{String: in.GetPhone(), Valid: true},
-			TtkId:     strconv.FormatInt(time.Now().Unix(), 10),
-			NickName:  sql.NullString{String: strconv.FormatInt(time.Now().Unix(), 10), Valid: true},
-			UpdatedAt: time.Now(),
-		}
+		userInfo = login.CreateDefaultUserInfo()
+		userInfo.Phone = sql.NullString{String: in.GetPhone(), Valid: true}
 		r, err := l.svcCtx.TtkUserInfoModel.Insert(l.ctx, userInfo)
 		if err != nil {
 			logx.Error(err)
-			return handleLoginError("网络繁忙，请重试尝试登录"), err
+			return handlePhoneLoginError("网络繁忙，请重试尝试登录"), err
 		} else if a, _ := r.RowsAffected(); a != 1 {
 			err = errors.New("数据库插入失败")
 			logx.Error(err)
-			return handleLoginError("网络繁忙，请重试尝试登录"), err
+			return handlePhoneLoginError("网络繁忙，请重试尝试登录"), err
 		}
 	} else if err != nil {
 		logx.Error(err)
-		return handleLoginError("网络繁忙，请重试尝试登录"), err
+		return handlePhoneLoginError("网络繁忙，请重试尝试登录"), err
 	}
 
 	return &user.PhoneVerifyCodeLoginResponse{
@@ -81,7 +72,7 @@ func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(in *user.PhoneVerifyCod
 	}, nil
 }
 
-func handleLoginError(message string) *user.PhoneVerifyCodeLoginResponse {
+func handlePhoneLoginError(message string) *user.PhoneVerifyCodeLoginResponse {
 	return &user.PhoneVerifyCodeLoginResponse{
 		StatusCode: 1,
 		Message:    message,

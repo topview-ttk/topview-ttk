@@ -19,89 +19,89 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	User_Ping_FullMethodName = "/user.User/Ping"
+	UserService_Ping_FullMethodName = "/user.UserService/Ping"
 )
 
-// UserClient is the client API for User service.
+// UserServiceClient is the client API for UserService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type UserClient interface {
+type UserServiceClient interface {
 	Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
 }
 
-type userClient struct {
+type userServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewUserClient(cc grpc.ClientConnInterface) UserClient {
-	return &userClient{cc}
+func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
+	return &userServiceClient{cc}
 }
 
-func (c *userClient) Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+func (c *userServiceClient) Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
 	out := new(Response)
-	err := c.cc.Invoke(ctx, User_Ping_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, UserService_Ping_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// UserServer is the server API for User service.
-// All implementations must embed UnimplementedUserServer
+// UserServiceServer is the server API for UserService service.
+// All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
-type UserServer interface {
+type UserServiceServer interface {
 	Ping(context.Context, *Request) (*Response, error)
-	mustEmbedUnimplementedUserServer()
+	mustEmbedUnimplementedUserServiceServer()
 }
 
-// UnimplementedUserServer must be embedded to have forward compatible implementations.
-type UnimplementedUserServer struct {
+// UnimplementedUserServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedUserServiceServer struct {
 }
 
-func (UnimplementedUserServer) Ping(context.Context, *Request) (*Response, error) {
+func (UnimplementedUserServiceServer) Ping(context.Context, *Request) (*Response, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
-func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
+func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
-// UnsafeUserServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to UserServer will
+// UnsafeUserServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UserServiceServer will
 // result in compilation errors.
-type UnsafeUserServer interface {
-	mustEmbedUnimplementedUserServer()
+type UnsafeUserServiceServer interface {
+	mustEmbedUnimplementedUserServiceServer()
 }
 
-func RegisterUserServer(s grpc.ServiceRegistrar, srv UserServer) {
-	s.RegisterService(&User_ServiceDesc, srv)
+func RegisterUserServiceServer(s grpc.ServiceRegistrar, srv UserServiceServer) {
+	s.RegisterService(&UserService_ServiceDesc, srv)
 }
 
-func _User_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _UserService_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServer).Ping(ctx, in)
+		return srv.(UserServiceServer).Ping(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: User_Ping_FullMethodName,
+		FullMethod: UserService_Ping_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServer).Ping(ctx, req.(*Request))
+		return srv.(UserServiceServer).Ping(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// User_ServiceDesc is the grpc.ServiceDesc for User service.
+// UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var User_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "user.User",
-	HandlerType: (*UserServer)(nil),
+var UserService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "user.UserService",
+	HandlerType: (*UserServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Ping",
-			Handler:    _User_Ping_Handler,
+			Handler:    _UserService_Ping_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -111,6 +111,8 @@ var User_ServiceDesc = grpc.ServiceDesc{
 const (
 	SsoService_SendPhoneVerificationCode_FullMethodName = "/user.SsoService/SendPhoneVerificationCode"
 	SsoService_PhoneVerifyCodeLogin_FullMethodName      = "/user.SsoService/PhoneVerifyCodeLogin"
+	SsoService_SendEmailVerificationCode_FullMethodName = "/user.SsoService/SendEmailVerificationCode"
+	SsoService_EmailVerifyCodeLogin_FullMethodName      = "/user.SsoService/EmailVerifyCodeLogin"
 )
 
 // SsoServiceClient is the client API for SsoService service.
@@ -119,6 +121,8 @@ const (
 type SsoServiceClient interface {
 	SendPhoneVerificationCode(ctx context.Context, in *SendPhoneVerificationCodeRequest, opts ...grpc.CallOption) (*SendPhoneVerificationCodeResponse, error)
 	PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*PhoneVerifyCodeLoginResponse, error)
+	SendEmailVerificationCode(ctx context.Context, in *SendEmailVerificationCodeRequest, opts ...grpc.CallOption) (*SendEmailVerificationCodeResponse, error)
+	EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*EmailVerifyCodeLoginResponse, error)
 }
 
 type ssoServiceClient struct {
@@ -147,12 +151,32 @@ func (c *ssoServiceClient) PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVe
 	return out, nil
 }
 
+func (c *ssoServiceClient) SendEmailVerificationCode(ctx context.Context, in *SendEmailVerificationCodeRequest, opts ...grpc.CallOption) (*SendEmailVerificationCodeResponse, error) {
+	out := new(SendEmailVerificationCodeResponse)
+	err := c.cc.Invoke(ctx, SsoService_SendEmailVerificationCode_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ssoServiceClient) EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*EmailVerifyCodeLoginResponse, error) {
+	out := new(EmailVerifyCodeLoginResponse)
+	err := c.cc.Invoke(ctx, SsoService_EmailVerifyCodeLogin_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SsoServiceServer is the server API for SsoService service.
 // All implementations must embed UnimplementedSsoServiceServer
 // for forward compatibility
 type SsoServiceServer interface {
 	SendPhoneVerificationCode(context.Context, *SendPhoneVerificationCodeRequest) (*SendPhoneVerificationCodeResponse, error)
 	PhoneVerifyCodeLogin(context.Context, *PhoneVerifyCodeLoginRequest) (*PhoneVerifyCodeLoginResponse, error)
+	SendEmailVerificationCode(context.Context, *SendEmailVerificationCodeRequest) (*SendEmailVerificationCodeResponse, error)
+	EmailVerifyCodeLogin(context.Context, *EmailVerifyCodeLoginRequest) (*EmailVerifyCodeLoginResponse, error)
 	mustEmbedUnimplementedSsoServiceServer()
 }
 
@@ -165,6 +189,12 @@ func (UnimplementedSsoServiceServer) SendPhoneVerificationCode(context.Context, 
 }
 func (UnimplementedSsoServiceServer) PhoneVerifyCodeLogin(context.Context, *PhoneVerifyCodeLoginRequest) (*PhoneVerifyCodeLoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PhoneVerifyCodeLogin not implemented")
+}
+func (UnimplementedSsoServiceServer) SendEmailVerificationCode(context.Context, *SendEmailVerificationCodeRequest) (*SendEmailVerificationCodeResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendEmailVerificationCode not implemented")
+}
+func (UnimplementedSsoServiceServer) EmailVerifyCodeLogin(context.Context, *EmailVerifyCodeLoginRequest) (*EmailVerifyCodeLoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EmailVerifyCodeLogin not implemented")
 }
 func (UnimplementedSsoServiceServer) mustEmbedUnimplementedSsoServiceServer() {}
 
@@ -215,6 +245,42 @@ func _SsoService_PhoneVerifyCodeLogin_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SsoService_SendEmailVerificationCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SendEmailVerificationCodeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SsoServiceServer).SendEmailVerificationCode(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SsoService_SendEmailVerificationCode_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SsoServiceServer).SendEmailVerificationCode(ctx, req.(*SendEmailVerificationCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SsoService_EmailVerifyCodeLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmailVerifyCodeLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SsoServiceServer).EmailVerifyCodeLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SsoService_EmailVerifyCodeLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SsoServiceServer).EmailVerifyCodeLogin(ctx, req.(*EmailVerifyCodeLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SsoService_ServiceDesc is the grpc.ServiceDesc for SsoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -229,6 +295,14 @@ var SsoService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PhoneVerifyCodeLogin",
 			Handler:    _SsoService_PhoneVerifyCodeLogin_Handler,
+		},
+		{
+			MethodName: "SendEmailVerificationCode",
+			Handler:    _SsoService_SendEmailVerificationCode_Handler,
+		},
+		{
+			MethodName: "EmailVerifyCodeLogin",
+			Handler:    _SsoService_EmailVerifyCodeLogin_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
