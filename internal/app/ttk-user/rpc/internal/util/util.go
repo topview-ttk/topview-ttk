@@ -8,3 +8,10 @@ func ValidatePhoneNumber(phoneNumber string) bool {
 	regex := regexp.MustCompile(pattern)
 	return regex.MatchString(phoneNumber)
 }
+
+func ValidateEmail(email string) bool {
+	// 使用正则表达式验证邮箱格式
+	pattern := `^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$`
+	regex := regexp.MustCompile(pattern)
+	return regex.MatchString(email)
+}
