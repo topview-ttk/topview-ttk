@@ -31,3 +31,13 @@ func (s *SsoServiceServer) PhoneVerifyCodeLogin(ctx context.Context, in *user.Ph
 	l := ssoservicelogic.NewPhoneVerifyCodeLoginLogic(ctx, s.svcCtx)
 	return l.PhoneVerifyCodeLogin(in)
 }
+
+func (s *SsoServiceServer) SendEmailVerificationCode(ctx context.Context, in *user.SendEmailVerificationCodeRequest) (*user.SendEmailVerificationCodeResponse, error) {
+	l := ssoservicelogic.NewSendEmailVerificationCodeLogic(ctx, s.svcCtx)
+	return l.SendEmailVerificationCode(in)
+}
+
+func (s *SsoServiceServer) EmailVerifyCodeLogin(ctx context.Context, in *user.EmailVerifyCodeLoginRequest) (*user.EmailVerifyCodeLoginResponse, error) {
+	l := ssoservicelogic.NewEmailVerifyCodeLoginLogic(ctx, s.svcCtx)
+	return l.EmailVerifyCodeLogin(in)
+}
