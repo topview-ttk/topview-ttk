@@ -4,19 +4,19 @@ import (
 	"github.com/zeromicro/go-zero/zrpc"
 	"topview-ttk/internal/app/ttk-api/internal/config"
 	"topview-ttk/internal/app/ttk-user/rpc/client/ssoservice"
-	"topview-ttk/internal/app/ttk-user/rpc/client/user"
+	"topview-ttk/internal/app/ttk-user/rpc/client/userservice"
 )
 
 type ServiceContext struct {
 	Config     config.Config
-	UserClient user.User
+	UserClient userservice.UserService
 	SsoClient  ssoservice.SsoService
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	return &ServiceContext{
 		Config:     c,
-		UserClient: user.NewUser(zrpc.MustNewClient(c.User)),
+		UserClient: userservice.NewUserService(zrpc.MustNewClient(c.User)),
 		SsoClient:  ssoservice.NewSsoService(zrpc.MustNewClient(c.User)),
 	}
 }

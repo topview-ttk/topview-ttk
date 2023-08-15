@@ -1,28 +1,66 @@
 syntax = "v1"
 
-type SendPhoneVerificationCodeRequest {
-	Phone       string `json:"phone"`
-	Device_info string `json:"device_info"`
-	Client_info string `json:"client_info"`
-}
+// 发送验证码=====
+// 发送手机验证码
+type (
+	SendPhoneVerificationCodeRequest {
+		Phone      string `json:"phone"`
+		DeviceInfo string `json:"device_info"`
+		ClientInfo string `json:"client_info"`
+	}
+	// 发送邮箱验证码
+	SendEmailVerificationCodeRequest {
+		Email      string `json:"email"`
+		DeviceInfo string `json:"device_info"`
+		ClientInfo string `json:"client_info"`
+	}
+	// 发送验证码响应
+	SendVerificationCodeResponse {
+		StatusCode int32  `json:"status_code"`
+		Message    string `json:"message"`
+	}
+)
+// 发送验证码=====
 
-type SendPhoneVerificationCodeResponse {
-	Status_code int32  `json:"status_code"`
-	Message     string `json:"message"`
-}
-
-type PhoneVerifyCodeLoginRequest {
-	Phone             string `json:"phone"`
-	Verification_code string `json:"verification_code"`
-	Device_info       string `json:"device_info"`
-	Client_info       string `json:"client_info"`
-}
-
-type PhoneVerifyCodeLoginResponse {
-	Status_code int32    `json:"status_code"`
-	Message     string   `json:"message"`
-	User_info   UserInfo `json:"user_info"`
-}
+// 登录=====
+type (
+	// 手机验证码登录
+	PhoneVerifyCodeLoginRequest {
+		Phone            string `json:"phone"`
+		VerificationCode string `json:"verification_code"`
+		DeviceInfo       string `json:"device_info"`
+		ClientInfo       string `json:"client_info"`
+	}
+	// 邮箱验证码登录
+	EmailVerifyCodeLoginRequest {
+		Email            string `json:"email"`
+		VerificationCode string `json:"verification_code"`
+		DeviceInfo       string `json:"device_info"`
+		ClientInfo       string `json:"client_info"`
+	}
+	// 手机密码登录
+	PhonePassLoginRequest {
+		Phone      string `json:"phone"`
+		Password   string `json:"password"`
+		DeviceInfo string `json:"device_info"`
+		ClientInfo string `json:"client_info"`
+	}
+	// 邮箱或ttkId登录
+	EmailOrTtkPassLoginRequest {
+		Email      string `json:"email"`
+		TtkId      string `json:"ttk_id"`
+		Password   string `json:"password"`
+		DeviceInfo string `json:"device_info"`
+		ClientInfo string `json:"client_info"`
+	}
+	// 登录响应
+	LoginResponse {
+		StatusCode int32    `json:"status_code"`
+		Message    string   `json:"message"`
+		UserInfo   UserInfo `json:"user_info"`
+	}
+)
+// 登录=====
 
 type UserInfo {
 }
@@ -32,9 +70,25 @@ type UserInfo {
 	group: user
 )
 service api_server {
+	//////////////////////////////// Send
 	@handler SendPhoneVerificationCode
-	post /sso/sendPhoneVerificationCode (SendPhoneVerificationCodeRequest) returns (SendPhoneVerificationCodeResponse)
+	post /sso/sendPhoneVerificationCode (SendPhoneVerificationCodeRequest) returns (SendVerificationCodeResponse)
 
+	@handler SendEmailVerificationCode
+	post /sso/sendEmailVerificationCode (SendEmailVerificationCodeRequest) returns (SendVerificationCodeResponse)
+	////////////////////////////////
+
+	//////////////////////////////// Login
 	@handler PhoneVerifyCodeLogin
-	post /sso/phoneVerifyCodeLogin (PhoneVerifyCodeLoginRequest) returns (PhoneVerifyCodeLoginResponse)
+	post /sso/phoneVerifyCodeLogin (PhoneVerifyCodeLoginRequest) returns (LoginResponse)
+
+	@handler EmailVerifyCodeLogin
+	post /sso/emailVerifyCodeLogin (EmailVerifyCodeLoginRequest) returns (LoginResponse)
+
+	@handler PhonePassLogin
+	post /sso/phonePassLogin (PhonePassLoginRequest) returns (LoginResponse)
+
+	@handler EmailOrTtkPassLogin
+	post /sso/emailOrTtkPassLogin (EmailOrTtkPassLoginRequest) returns (LoginResponse)
+	//////////////////////////////// Login
 }
