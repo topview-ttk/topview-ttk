@@ -19,8 +19,8 @@ import (
 var (
 	ttkAuthorizationFieldNames          = builder.RawFieldNames(&TtkAuthorization{})
 	ttkAuthorizationRows                = strings.Join(ttkAuthorizationFieldNames, ",")
-	ttkAuthorizationRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkAuthorizationFieldNames, "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), ",")
-	ttkAuthorizationRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkAuthorizationFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), "=?,") + "=?"
+	ttkAuthorizationRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkAuthorizationFieldNames, "`created_at`", "`deleted_at`", "`updated_at`"), ",")
+	ttkAuthorizationRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkAuthorizationFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkAuthorizationIdPrefix = "cache:ttkAuthorization:id:"
 )
@@ -95,8 +95,8 @@ func (m *defaultTtkAuthorizationModel) FindOne(ctx context.Context, id int64) (*
 func (m *defaultTtkAuthorizationModel) Insert(ctx context.Context, data *TtkAuthorization) (sql.Result, error) {
 	ttkAuthorizationIdKey := fmt.Sprintf("%s%v", cacheTtkAuthorizationIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, ttkAuthorizationRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.Id, data.UserId, data.ClientId, data.AuthorizationCode, data.AccessToken, data.RefreshToken, data.ExpiresAt, data.UpdatedAt, data.DeletedAt)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?)", m.table, ttkAuthorizationRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.Id, data.UserId, data.ClientId, data.AuthorizationCode, data.AccessToken, data.RefreshToken, data.ExpiresAt)
 	}, ttkAuthorizationIdKey)
 	return ret, err
 }
@@ -105,7 +105,7 @@ func (m *defaultTtkAuthorizationModel) Update(ctx context.Context, data *TtkAuth
 	ttkAuthorizationIdKey := fmt.Sprintf("%s%v", cacheTtkAuthorizationIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkAuthorizationRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.ClientId, data.AuthorizationCode, data.AccessToken, data.RefreshToken, data.ExpiresAt, data.UpdatedAt, data.DeletedAt, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.ClientId, data.AuthorizationCode, data.AccessToken, data.RefreshToken, data.ExpiresAt, data.Id)
 	}, ttkAuthorizationIdKey)
 	return err
 }

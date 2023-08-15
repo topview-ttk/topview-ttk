@@ -19,8 +19,8 @@ import (
 var (
 	ttkUserSettingsFieldNames          = builder.RawFieldNames(&TtkUserSettings{})
 	ttkUserSettingsRows                = strings.Join(ttkUserSettingsFieldNames, ",")
-	ttkUserSettingsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserSettingsFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), ",")
-	ttkUserSettingsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserSettingsFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), "=?,") + "=?"
+	ttkUserSettingsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserSettingsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
+	ttkUserSettingsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserSettingsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkUserSettingsIdPrefix = "cache:ttkUserSettings:id:"
 )
@@ -92,8 +92,8 @@ func (m *defaultTtkUserSettingsModel) FindOne(ctx context.Context, id int64) (*T
 func (m *defaultTtkUserSettingsModel) Insert(ctx context.Context, data *TtkUserSettings) (sql.Result, error) {
 	ttkUserSettingsIdKey := fmt.Sprintf("%s%v", cacheTtkUserSettingsIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?)", m.table, ttkUserSettingsRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.NotificationPreferences, data.PrivacySettings, data.UpdatedAt, data.DeletedAt)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, ttkUserSettingsRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.NotificationPreferences, data.PrivacySettings)
 	}, ttkUserSettingsIdKey)
 	return ret, err
 }
@@ -102,7 +102,7 @@ func (m *defaultTtkUserSettingsModel) Update(ctx context.Context, data *TtkUserS
 	ttkUserSettingsIdKey := fmt.Sprintf("%s%v", cacheTtkUserSettingsIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkUserSettingsRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.NotificationPreferences, data.PrivacySettings, data.UpdatedAt, data.DeletedAt, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.NotificationPreferences, data.PrivacySettings, data.Id)
 	}, ttkUserSettingsIdKey)
 	return err
 }

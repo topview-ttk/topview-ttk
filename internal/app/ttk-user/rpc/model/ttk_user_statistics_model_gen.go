@@ -19,8 +19,8 @@ import (
 var (
 	ttkUserStatisticsFieldNames          = builder.RawFieldNames(&TtkUserStatistics{})
 	ttkUserStatisticsRows                = strings.Join(ttkUserStatisticsFieldNames, ",")
-	ttkUserStatisticsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserStatisticsFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), ",")
-	ttkUserStatisticsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserStatisticsFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), "=?,") + "=?"
+	ttkUserStatisticsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserStatisticsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
+	ttkUserStatisticsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserStatisticsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkUserStatisticsIdPrefix = "cache:ttkUserStatistics:id:"
 )
@@ -93,8 +93,8 @@ func (m *defaultTtkUserStatisticsModel) FindOne(ctx context.Context, id int64) (
 func (m *defaultTtkUserStatisticsModel) Insert(ctx context.Context, data *TtkUserStatistics) (sql.Result, error) {
 	ttkUserStatisticsIdKey := fmt.Sprintf("%s%v", cacheTtkUserStatisticsIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?)", m.table, ttkUserStatisticsRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.PostsCount, data.CommentsCount, data.LikesCount, data.UpdatedAt, data.DeletedAt)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, ttkUserStatisticsRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.PostsCount, data.CommentsCount, data.LikesCount)
 	}, ttkUserStatisticsIdKey)
 	return ret, err
 }
@@ -103,7 +103,7 @@ func (m *defaultTtkUserStatisticsModel) Update(ctx context.Context, data *TtkUse
 	ttkUserStatisticsIdKey := fmt.Sprintf("%s%v", cacheTtkUserStatisticsIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkUserStatisticsRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.PostsCount, data.CommentsCount, data.LikesCount, data.UpdatedAt, data.DeletedAt, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.PostsCount, data.CommentsCount, data.LikesCount, data.Id)
 	}, ttkUserStatisticsIdKey)
 	return err
 }
