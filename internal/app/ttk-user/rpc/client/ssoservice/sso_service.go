@@ -13,16 +13,21 @@ import (
 )
 
 type (
-	EmailOrTTKPassLoginRequest       = user.EmailOrTTKPassLoginRequest
+	EmailPassLoginRequest            = user.EmailPassLoginRequest
+	EmailRegisterRequest             = user.EmailRegisterRequest
 	EmailVerifyCodeLoginRequest      = user.EmailVerifyCodeLoginRequest
+	GitHubLoginRequest               = user.GitHubLoginRequest
 	LoginResponse                    = user.LoginResponse
 	PhonePassLoginRequest            = user.PhonePassLoginRequest
+	PhoneRegisterRequest             = user.PhoneRegisterRequest
 	PhoneVerifyCodeLoginRequest      = user.PhoneVerifyCodeLoginRequest
+	RegisterResponse                 = user.RegisterResponse
 	Request                          = user.Request
 	Response                         = user.Response
 	SendEmailVerificationCodeRequest = user.SendEmailVerificationCodeRequest
 	SendPhoneVerificationCodeRequest = user.SendPhoneVerificationCodeRequest
 	SendVerificationCodeResponse     = user.SendVerificationCodeResponse
+	TTKPassLoginRequest              = user.TTKPassLoginRequest
 	UserInfo                         = user.UserInfo
 
 	SsoService interface {
@@ -33,7 +38,12 @@ type (
 		PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		PhonePassLogin(ctx context.Context, in *PhonePassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-		EmailOrTtkPassLogin(ctx context.Context, in *EmailOrTTKPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		TtkidPassLogin(ctx context.Context, in *TTKPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		EmailPassLogin(ctx context.Context, in *EmailPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		GithubLogin(ctx context.Context, in *GitHubLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		// 注册
+		EmailRegister(ctx context.Context, in *EmailRegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
+		PhoneRegister(ctx context.Context, in *PhoneRegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	}
 
 	defaultSsoService struct {
@@ -74,7 +84,28 @@ func (m *defaultSsoService) PhonePassLogin(ctx context.Context, in *PhonePassLog
 	return client.PhonePassLogin(ctx, in, opts...)
 }
 
-func (m *defaultSsoService) EmailOrTtkPassLogin(ctx context.Context, in *EmailOrTTKPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+func (m *defaultSsoService) TtkidPassLogin(ctx context.Context, in *TTKPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	client := user.NewSsoServiceClient(m.cli.Conn())
-	return client.EmailOrTtkPassLogin(ctx, in, opts...)
+	return client.TtkidPassLogin(ctx, in, opts...)
+}
+
+func (m *defaultSsoService) EmailPassLogin(ctx context.Context, in *EmailPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.EmailPassLogin(ctx, in, opts...)
+}
+
+func (m *defaultSsoService) GithubLogin(ctx context.Context, in *GitHubLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.GithubLogin(ctx, in, opts...)
+}
+
+// 注册
+func (m *defaultSsoService) EmailRegister(ctx context.Context, in *EmailRegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.EmailRegister(ctx, in, opts...)
+}
+
+func (m *defaultSsoService) PhoneRegister(ctx context.Context, in *PhoneRegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.PhoneRegister(ctx, in, opts...)
 }

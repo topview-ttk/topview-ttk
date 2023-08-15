@@ -39,10 +39,22 @@ type PhonePassLoginRequest struct {
 	ClientInfo string `json:"client_info"`
 }
 
-type EmailOrTtkPassLoginRequest struct {
+type EmailLoginRequest struct {
 	Email      string `json:"email"`
-	TtkId      string `json:"ttk_id"`
 	Password   string `json:"password"`
+	DeviceInfo string `json:"device_info"`
+	ClientInfo string `json:"client_info"`
+}
+
+type TTkIDLoginRequest struct {
+	TTkId      string `json:"ttk_id"`
+	Password   string `json:"password"`
+	DeviceInfo string `json:"device_info"`
+	ClientInfo string `json:"client_info"`
+}
+
+type GithubLoginRequest struct {
+	Token      string `json:"token"`
 	DeviceInfo string `json:"device_info"`
 	ClientInfo string `json:"client_info"`
 }
@@ -53,5 +65,23 @@ type LoginResponse struct {
 	UserInfo   UserInfo `json:"user_info"`
 }
 
+type PhoneRegisterRequest struct {
+	NickName string `json:"nickname"`
+	Phone    string `json:"Phone"`
+	Password string `json:"password"`
+}
+
+type EmailRegisterRequest struct {
+	NickName string `json:"nickname"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type RegisterResponse struct {
+	StatusCode int32  `json:"status_code"`
+	Message    string `json:"message"`
+}
+
 type UserInfo struct {
+	TTkId string `json:"ttk_id"`
 }

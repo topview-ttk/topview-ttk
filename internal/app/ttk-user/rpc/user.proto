@@ -87,15 +87,33 @@ message PhonePassLoginRequest {
   string client_info = 4;
 }
 
-// 邮箱或ttkId登录
-message EmailOrTTKPassLoginRequest {
+// 邮箱登录
+message EmailPassLoginRequest {
   string email = 1;
-  string ttkId = 2;
-  string pass = 3;
+  string pass = 2;
   // 设备信息
-  string device_info = 4;
+  string device_info = 3;
   // 客户端版本
-  string client_info = 5;
+  string client_info = 4;
+}
+
+// ttkId登录
+message TTKPassLoginRequest {
+  string ttkId = 1;
+  string pass = 2;
+  // 设备信息
+  string device_info = 3;
+  // 客户端版本
+  string client_info = 4;
+}
+
+// Github登录
+message GitHubLoginRequest {
+  string token = 1;
+  // 设备信息
+  string device_info = 2;
+  // 客户端版本
+  string client_info = 3;
 }
 
 // 登录响应
@@ -104,7 +122,31 @@ message LoginResponse {
   string message = 2;
   UserInfo userInfo = 3;
 }
-// 登录=====
+// 登录==========
+
+
+// 注册==========
+// 邮箱注册
+message EmailRegisterRequest {
+  string nickname = 1;
+  string email = 2;
+  string password = 3;
+}
+
+// 手机号注册
+message PhoneRegisterRequest {
+  string nickname = 1;
+  string phone = 2;
+  string password = 3;
+}
+
+// 注册响应
+message RegisterResponse {
+  StatusCode statusCode = 1;
+  string message = 2;
+}
+// 注册==========
+
 
 service SsoService{
   // 发送验证码
@@ -115,6 +157,12 @@ service SsoService{
   rpc PhoneVerifyCodeLogin(PhoneVerifyCodeLoginRequest) returns (LoginResponse);
   rpc EmailVerifyCodeLogin(EmailVerifyCodeLoginRequest) returns (LoginResponse);
   rpc PhonePassLogin(PhonePassLoginRequest) returns(LoginResponse);
-  rpc EmailOrTtkPassLogin(EmailOrTTKPassLoginRequest) returns(LoginResponse);
+  rpc TtkidPassLogin(TTKPassLoginRequest) returns (LoginResponse);
+  rpc EmailPassLogin(EmailPassLoginRequest) returns (LoginResponse);
+  rpc GithubLogin(GitHubLoginRequest) returns (LoginResponse);
+
+  // 注册
+  rpc EmailRegister(EmailRegisterRequest) returns (RegisterResponse);
+  rpc PhoneRegister(PhoneRegisterRequest) returns (RegisterResponse);
 }
 

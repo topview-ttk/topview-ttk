@@ -49,7 +49,28 @@ func (s *SsoServiceServer) PhonePassLogin(ctx context.Context, in *user.PhonePas
 	return l.PhonePassLogin(in)
 }
 
-func (s *SsoServiceServer) EmailOrTtkPassLogin(ctx context.Context, in *user.EmailOrTTKPassLoginRequest) (*user.LoginResponse, error) {
-	l := ssoservicelogic.NewEmailOrTtkPassLoginLogic(ctx, s.svcCtx)
-	return l.EmailOrTtkPassLogin(in)
+func (s *SsoServiceServer) TtkidPassLogin(ctx context.Context, in *user.TTKPassLoginRequest) (*user.LoginResponse, error) {
+	l := ssoservicelogic.NewTtkidPassLoginLogic(ctx, s.svcCtx)
+	return l.TtkidPassLogin(in)
+}
+
+func (s *SsoServiceServer) EmailPassLogin(ctx context.Context, in *user.EmailPassLoginRequest) (*user.LoginResponse, error) {
+	l := ssoservicelogic.NewEmailPassLoginLogic(ctx, s.svcCtx)
+	return l.EmailPassLogin(in)
+}
+
+func (s *SsoServiceServer) GithubLogin(ctx context.Context, in *user.GitHubLoginRequest) (*user.LoginResponse, error) {
+	l := ssoservicelogic.NewGithubLoginLogic(ctx, s.svcCtx)
+	return l.GithubLogin(in)
+}
+
+// 注册
+func (s *SsoServiceServer) EmailRegister(ctx context.Context, in *user.EmailRegisterRequest) (*user.RegisterResponse, error) {
+	l := ssoservicelogic.NewEmailRegisterLogic(ctx, s.svcCtx)
+	return l.EmailRegister(in)
+}
+
+func (s *SsoServiceServer) PhoneRegister(ctx context.Context, in *user.PhoneRegisterRequest) (*user.RegisterResponse, error) {
+	l := ssoservicelogic.NewPhoneRegisterLogic(ctx, s.svcCtx)
+	return l.PhoneRegister(in)
 }

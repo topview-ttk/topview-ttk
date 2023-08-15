@@ -1,8 +1,8 @@
 syntax = "v1"
 
 // 发送验证码=====
-// 发送手机验证码
 type (
+	// 发送手机验证码
 	SendPhoneVerificationCodeRequest {
 		Phone      string `json:"phone"`
 		DeviceInfo string `json:"device_info"`
@@ -45,14 +45,27 @@ type (
 		DeviceInfo string `json:"device_info"`
 		ClientInfo string `json:"client_info"`
 	}
-	// 邮箱或ttkId登录
-	EmailOrTtkPassLoginRequest {
+	// 邮箱密码登录
+	EmailLoginRequest {
 		Email      string `json:"email"`
-		TtkId      string `json:"ttk_id"`
 		Password   string `json:"password"`
 		DeviceInfo string `json:"device_info"`
 		ClientInfo string `json:"client_info"`
 	}
+	// ttk_id密码登录
+	TTkIDLoginRequest {
+		TTkId      string `json:"ttk_id"`
+		Password   string `json:"password"`
+		DeviceInfo string `json:"device_info"`
+		ClientInfo string `json:"client_info"`
+	}
+	// GitHub登录
+	GithubLoginRequest {
+		Token      string `json:"token"`
+		DeviceInfo string `json:"device_info"`
+		ClientInfo string `json:"client_info"`
+	}
+
 	// 登录响应
 	LoginResponse {
 		StatusCode int32    `json:"status_code"`
@@ -62,7 +75,32 @@ type (
 )
 // 登录=====
 
+// 注册=====
+type (
+	// 手机号注册请求
+	PhoneRegisterRequest {
+		NickName string `json:"nickname"`
+		Phone    string `json:"Phone"`
+		Password string `json:"password"`
+	}
+
+	// 邮箱注册请求
+	EmailRegisterRequest {
+		NickName string `json:"nickname"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	// 注册响应
+	RegisterResponse {
+		StatusCode int32  `json:"status_code"`
+		Message    string `json:"message"`
+	}
+)
+// 注册=====
+
 type UserInfo {
+	TTkId string `json:"ttk_id"`
 }
 
 @server(
@@ -79,16 +117,38 @@ service api_server {
 	////////////////////////////////
 
 	//////////////////////////////// Login
+	// 手机验证码登录
 	@handler PhoneVerifyCodeLogin
 	post /sso/phoneVerifyCodeLogin (PhoneVerifyCodeLoginRequest) returns (LoginResponse)
 
+	// 邮箱验证码登录
 	@handler EmailVerifyCodeLogin
 	post /sso/emailVerifyCodeLogin (EmailVerifyCodeLoginRequest) returns (LoginResponse)
 
+	// 手机密码登录
 	@handler PhonePassLogin
 	post /sso/phonePassLogin (PhonePassLoginRequest) returns (LoginResponse)
 
-	@handler EmailOrTtkPassLogin
-	post /sso/emailOrTtkPassLogin (EmailOrTtkPassLoginRequest) returns (LoginResponse)
-	//////////////////////////////// Login
+	// 邮箱密码登录
+	@handler EmailPassLogin
+	post /sso/emailPassLogin (EmailLoginRequest) returns (LoginResponse)
+
+	// ttk_id密码登录
+	@handler TtkidPassLogin
+	post /sso/TTKIDPassLogin (TTkIDLoginRequest) returns (LoginResponse)
+
+	// GitHub登录
+	@handler GithubLogin
+	post /sso/GithubLogin (GithubLoginRequest) returns (LoginResponse)
+	////////////////////////////////
+
+	//////////////////////////////// register
+	// 手机号注册
+	@handler PhoneRegister
+	post /sso/PhoneRegister (PhoneRegisterRequest) returns (RegisterResponse)
+
+	// 邮箱注册
+	@handler EmailRegister
+	post /sso/EmailRegister (EmailRegisterRequest) returns (RegisterResponse)
+
 }

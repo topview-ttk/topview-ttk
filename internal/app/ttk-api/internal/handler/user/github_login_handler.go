@@ -9,16 +9,16 @@ import (
 	"topview-ttk/internal/app/ttk-api/internal/types"
 )
 
-func EmailOrTtkPassLoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func GithubLoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.EmailOrTtkPassLoginRequest
+		var req types.GithubLoginRequest
 		if err := httpx.Parse(r, &req); err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
 
-		l := user.NewEmailOrTtkPassLoginLogic(r.Context(), svcCtx)
-		resp, err := l.EmailOrTtkPassLogin(&req)
+		l := user.NewGithubLoginLogic(r.Context(), svcCtx)
+		resp, err := l.GithubLogin(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

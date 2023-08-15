@@ -13,16 +13,21 @@ import (
 )
 
 type (
-	EmailOrTTKPassLoginRequest       = user.EmailOrTTKPassLoginRequest
+	EmailPassLoginRequest            = user.EmailPassLoginRequest
+	EmailRegisterRequest             = user.EmailRegisterRequest
 	EmailVerifyCodeLoginRequest      = user.EmailVerifyCodeLoginRequest
+	GitHubLoginRequest               = user.GitHubLoginRequest
 	LoginResponse                    = user.LoginResponse
 	PhonePassLoginRequest            = user.PhonePassLoginRequest
+	PhoneRegisterRequest             = user.PhoneRegisterRequest
 	PhoneVerifyCodeLoginRequest      = user.PhoneVerifyCodeLoginRequest
+	RegisterResponse                 = user.RegisterResponse
 	Request                          = user.Request
 	Response                         = user.Response
 	SendEmailVerificationCodeRequest = user.SendEmailVerificationCodeRequest
 	SendPhoneVerificationCodeRequest = user.SendPhoneVerificationCodeRequest
 	SendVerificationCodeResponse     = user.SendVerificationCodeResponse
+	TTKPassLoginRequest              = user.TTKPassLoginRequest
 	UserInfo                         = user.UserInfo
 
 	UserService interface {

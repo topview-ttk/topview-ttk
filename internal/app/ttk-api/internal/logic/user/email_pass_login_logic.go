@@ -10,24 +10,24 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type EmailOrTtkPassLoginLogic struct {
+type EmailPassLoginLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewEmailOrTtkPassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *EmailOrTtkPassLoginLogic {
-	return &EmailOrTtkPassLoginLogic{
+func NewEmailPassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *EmailPassLoginLogic {
+	return &EmailPassLoginLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *EmailOrTtkPassLoginLogic) EmailOrTtkPassLogin(req *types.EmailOrTtkPassLoginRequest) (resp *types.LoginResponse, err error) {
-	rpcResp, err := l.svcCtx.SsoClient.EmailOrTtkPassLogin(l.ctx, &user.EmailOrTTKPassLoginRequest{
+func (l *EmailPassLoginLogic) EmailPassLogin(req *types.EmailLoginRequest) (resp *types.LoginResponse, err error) {
+
+	rpcResp, err := l.svcCtx.SsoClient.EmailPassLogin(l.ctx, &user.EmailPassLoginRequest{
 		Email:      req.Email,
-		TtkId:      req.TtkId,
 		Pass:       req.Password,
 		DeviceInfo: req.DeviceInfo,
 		ClientInfo: req.ClientInfo,
