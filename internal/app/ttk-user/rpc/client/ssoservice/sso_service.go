@@ -13,23 +13,27 @@ import (
 )
 
 type (
-	EmailVerifyCodeLoginRequest       = user.EmailVerifyCodeLoginRequest
-	EmailVerifyCodeLoginResponse      = user.EmailVerifyCodeLoginResponse
-	PhoneVerifyCodeLoginRequest       = user.PhoneVerifyCodeLoginRequest
-	PhoneVerifyCodeLoginResponse      = user.PhoneVerifyCodeLoginResponse
-	Request                           = user.Request
-	Response                          = user.Response
-	SendEmailVerificationCodeRequest  = user.SendEmailVerificationCodeRequest
-	SendEmailVerificationCodeResponse = user.SendEmailVerificationCodeResponse
-	SendPhoneVerificationCodeRequest  = user.SendPhoneVerificationCodeRequest
-	SendPhoneVerificationCodeResponse = user.SendPhoneVerificationCodeResponse
-	UserInfo                          = user.UserInfo
+	EmailOrTTKPassLoginRequest       = user.EmailOrTTKPassLoginRequest
+	EmailVerifyCodeLoginRequest      = user.EmailVerifyCodeLoginRequest
+	LoginResponse                    = user.LoginResponse
+	PhonePassLoginRequest            = user.PhonePassLoginRequest
+	PhoneVerifyCodeLoginRequest      = user.PhoneVerifyCodeLoginRequest
+	Request                          = user.Request
+	Response                         = user.Response
+	SendEmailVerificationCodeRequest = user.SendEmailVerificationCodeRequest
+	SendPhoneVerificationCodeRequest = user.SendPhoneVerificationCodeRequest
+	SendVerificationCodeResponse     = user.SendVerificationCodeResponse
+	UserInfo                         = user.UserInfo
 
 	SsoService interface {
-		SendPhoneVerificationCode(ctx context.Context, in *SendPhoneVerificationCodeRequest, opts ...grpc.CallOption) (*SendPhoneVerificationCodeResponse, error)
-		PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*PhoneVerifyCodeLoginResponse, error)
-		SendEmailVerificationCode(ctx context.Context, in *SendEmailVerificationCodeRequest, opts ...grpc.CallOption) (*SendEmailVerificationCodeResponse, error)
-		EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*EmailVerifyCodeLoginResponse, error)
+		// 发送验证码
+		SendPhoneVerificationCode(ctx context.Context, in *SendPhoneVerificationCodeRequest, opts ...grpc.CallOption) (*SendVerificationCodeResponse, error)
+		SendEmailVerificationCode(ctx context.Context, in *SendEmailVerificationCodeRequest, opts ...grpc.CallOption) (*SendVerificationCodeResponse, error)
+		// 登录
+		PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		PhonePassLogin(ctx context.Context, in *PhonePassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		EmailOrTtkPassLogin(ctx context.Context, in *EmailOrTTKPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	}
 
 	defaultSsoService struct {
@@ -43,22 +47,34 @@ func NewSsoService(cli zrpc.Client) SsoService {
 	}
 }
 
-func (m *defaultSsoService) SendPhoneVerificationCode(ctx context.Context, in *SendPhoneVerificationCodeRequest, opts ...grpc.CallOption) (*SendPhoneVerificationCodeResponse, error) {
+// 发送验证码
+func (m *defaultSsoService) SendPhoneVerificationCode(ctx context.Context, in *SendPhoneVerificationCodeRequest, opts ...grpc.CallOption) (*SendVerificationCodeResponse, error) {
 	client := user.NewSsoServiceClient(m.cli.Conn())
 	return client.SendPhoneVerificationCode(ctx, in, opts...)
 }
 
-func (m *defaultSsoService) PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*PhoneVerifyCodeLoginResponse, error) {
-	client := user.NewSsoServiceClient(m.cli.Conn())
-	return client.PhoneVerifyCodeLogin(ctx, in, opts...)
-}
-
-func (m *defaultSsoService) SendEmailVerificationCode(ctx context.Context, in *SendEmailVerificationCodeRequest, opts ...grpc.CallOption) (*SendEmailVerificationCodeResponse, error) {
+func (m *defaultSsoService) SendEmailVerificationCode(ctx context.Context, in *SendEmailVerificationCodeRequest, opts ...grpc.CallOption) (*SendVerificationCodeResponse, error) {
 	client := user.NewSsoServiceClient(m.cli.Conn())
 	return client.SendEmailVerificationCode(ctx, in, opts...)
 }
 
-func (m *defaultSsoService) EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*EmailVerifyCodeLoginResponse, error) {
+// 登录
+func (m *defaultSsoService) PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.PhoneVerifyCodeLogin(ctx, in, opts...)
+}
+
+func (m *defaultSsoService) EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	client := user.NewSsoServiceClient(m.cli.Conn())
 	return client.EmailVerifyCodeLogin(ctx, in, opts...)
+}
+
+func (m *defaultSsoService) PhonePassLogin(ctx context.Context, in *PhonePassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.PhonePassLogin(ctx, in, opts...)
+}
+
+func (m *defaultSsoService) EmailOrTtkPassLogin(ctx context.Context, in *EmailOrTTKPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.EmailOrTtkPassLogin(ctx, in, opts...)
 }

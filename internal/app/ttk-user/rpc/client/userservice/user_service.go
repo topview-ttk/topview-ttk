@@ -13,17 +13,17 @@ import (
 )
 
 type (
-	EmailVerifyCodeLoginRequest       = user.EmailVerifyCodeLoginRequest
-	EmailVerifyCodeLoginResponse      = user.EmailVerifyCodeLoginResponse
-	PhoneVerifyCodeLoginRequest       = user.PhoneVerifyCodeLoginRequest
-	PhoneVerifyCodeLoginResponse      = user.PhoneVerifyCodeLoginResponse
-	Request                           = user.Request
-	Response                          = user.Response
-	SendEmailVerificationCodeRequest  = user.SendEmailVerificationCodeRequest
-	SendEmailVerificationCodeResponse = user.SendEmailVerificationCodeResponse
-	SendPhoneVerificationCodeRequest  = user.SendPhoneVerificationCodeRequest
-	SendPhoneVerificationCodeResponse = user.SendPhoneVerificationCodeResponse
-	UserInfo                          = user.UserInfo
+	EmailOrTTKPassLoginRequest       = user.EmailOrTTKPassLoginRequest
+	EmailVerifyCodeLoginRequest      = user.EmailVerifyCodeLoginRequest
+	LoginResponse                    = user.LoginResponse
+	PhonePassLoginRequest            = user.PhonePassLoginRequest
+	PhoneVerifyCodeLoginRequest      = user.PhoneVerifyCodeLoginRequest
+	Request                          = user.Request
+	Response                         = user.Response
+	SendEmailVerificationCodeRequest = user.SendEmailVerificationCodeRequest
+	SendPhoneVerificationCodeRequest = user.SendPhoneVerificationCodeRequest
+	SendVerificationCodeResponse     = user.SendVerificationCodeResponse
+	UserInfo                         = user.UserInfo
 
 	UserService interface {
 		Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)

@@ -110,19 +110,25 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 
 const (
 	SsoService_SendPhoneVerificationCode_FullMethodName = "/user.SsoService/SendPhoneVerificationCode"
-	SsoService_PhoneVerifyCodeLogin_FullMethodName      = "/user.SsoService/PhoneVerifyCodeLogin"
 	SsoService_SendEmailVerificationCode_FullMethodName = "/user.SsoService/SendEmailVerificationCode"
+	SsoService_PhoneVerifyCodeLogin_FullMethodName      = "/user.SsoService/PhoneVerifyCodeLogin"
 	SsoService_EmailVerifyCodeLogin_FullMethodName      = "/user.SsoService/EmailVerifyCodeLogin"
+	SsoService_PhonePassLogin_FullMethodName            = "/user.SsoService/PhonePassLogin"
+	SsoService_EmailOrTtkPassLogin_FullMethodName       = "/user.SsoService/EmailOrTtkPassLogin"
 )
 
 // SsoServiceClient is the client API for SsoService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SsoServiceClient interface {
-	SendPhoneVerificationCode(ctx context.Context, in *SendPhoneVerificationCodeRequest, opts ...grpc.CallOption) (*SendPhoneVerificationCodeResponse, error)
-	PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*PhoneVerifyCodeLoginResponse, error)
-	SendEmailVerificationCode(ctx context.Context, in *SendEmailVerificationCodeRequest, opts ...grpc.CallOption) (*SendEmailVerificationCodeResponse, error)
-	EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*EmailVerifyCodeLoginResponse, error)
+	// 发送验证码
+	SendPhoneVerificationCode(ctx context.Context, in *SendPhoneVerificationCodeRequest, opts ...grpc.CallOption) (*SendVerificationCodeResponse, error)
+	SendEmailVerificationCode(ctx context.Context, in *SendEmailVerificationCodeRequest, opts ...grpc.CallOption) (*SendVerificationCodeResponse, error)
+	// 登录
+	PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	PhonePassLogin(ctx context.Context, in *PhonePassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	EmailOrTtkPassLogin(ctx context.Context, in *EmailOrTTKPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 }
 
 type ssoServiceClient struct {
@@ -133,8 +139,8 @@ func NewSsoServiceClient(cc grpc.ClientConnInterface) SsoServiceClient {
 	return &ssoServiceClient{cc}
 }
 
-func (c *ssoServiceClient) SendPhoneVerificationCode(ctx context.Context, in *SendPhoneVerificationCodeRequest, opts ...grpc.CallOption) (*SendPhoneVerificationCodeResponse, error) {
-	out := new(SendPhoneVerificationCodeResponse)
+func (c *ssoServiceClient) SendPhoneVerificationCode(ctx context.Context, in *SendPhoneVerificationCodeRequest, opts ...grpc.CallOption) (*SendVerificationCodeResponse, error) {
+	out := new(SendVerificationCodeResponse)
 	err := c.cc.Invoke(ctx, SsoService_SendPhoneVerificationCode_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -142,17 +148,8 @@ func (c *ssoServiceClient) SendPhoneVerificationCode(ctx context.Context, in *Se
 	return out, nil
 }
 
-func (c *ssoServiceClient) PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*PhoneVerifyCodeLoginResponse, error) {
-	out := new(PhoneVerifyCodeLoginResponse)
-	err := c.cc.Invoke(ctx, SsoService_PhoneVerifyCodeLogin_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *ssoServiceClient) SendEmailVerificationCode(ctx context.Context, in *SendEmailVerificationCodeRequest, opts ...grpc.CallOption) (*SendEmailVerificationCodeResponse, error) {
-	out := new(SendEmailVerificationCodeResponse)
+func (c *ssoServiceClient) SendEmailVerificationCode(ctx context.Context, in *SendEmailVerificationCodeRequest, opts ...grpc.CallOption) (*SendVerificationCodeResponse, error) {
+	out := new(SendVerificationCodeResponse)
 	err := c.cc.Invoke(ctx, SsoService_SendEmailVerificationCode_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -160,9 +157,36 @@ func (c *ssoServiceClient) SendEmailVerificationCode(ctx context.Context, in *Se
 	return out, nil
 }
 
-func (c *ssoServiceClient) EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*EmailVerifyCodeLoginResponse, error) {
-	out := new(EmailVerifyCodeLoginResponse)
+func (c *ssoServiceClient) PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	out := new(LoginResponse)
+	err := c.cc.Invoke(ctx, SsoService_PhoneVerifyCodeLogin_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ssoServiceClient) EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	out := new(LoginResponse)
 	err := c.cc.Invoke(ctx, SsoService_EmailVerifyCodeLogin_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ssoServiceClient) PhonePassLogin(ctx context.Context, in *PhonePassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	out := new(LoginResponse)
+	err := c.cc.Invoke(ctx, SsoService_PhonePassLogin_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *ssoServiceClient) EmailOrTtkPassLogin(ctx context.Context, in *EmailOrTTKPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	out := new(LoginResponse)
+	err := c.cc.Invoke(ctx, SsoService_EmailOrTtkPassLogin_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -173,10 +197,14 @@ func (c *ssoServiceClient) EmailVerifyCodeLogin(ctx context.Context, in *EmailVe
 // All implementations must embed UnimplementedSsoServiceServer
 // for forward compatibility
 type SsoServiceServer interface {
-	SendPhoneVerificationCode(context.Context, *SendPhoneVerificationCodeRequest) (*SendPhoneVerificationCodeResponse, error)
-	PhoneVerifyCodeLogin(context.Context, *PhoneVerifyCodeLoginRequest) (*PhoneVerifyCodeLoginResponse, error)
-	SendEmailVerificationCode(context.Context, *SendEmailVerificationCodeRequest) (*SendEmailVerificationCodeResponse, error)
-	EmailVerifyCodeLogin(context.Context, *EmailVerifyCodeLoginRequest) (*EmailVerifyCodeLoginResponse, error)
+	// 发送验证码
+	SendPhoneVerificationCode(context.Context, *SendPhoneVerificationCodeRequest) (*SendVerificationCodeResponse, error)
+	SendEmailVerificationCode(context.Context, *SendEmailVerificationCodeRequest) (*SendVerificationCodeResponse, error)
+	// 登录
+	PhoneVerifyCodeLogin(context.Context, *PhoneVerifyCodeLoginRequest) (*LoginResponse, error)
+	EmailVerifyCodeLogin(context.Context, *EmailVerifyCodeLoginRequest) (*LoginResponse, error)
+	PhonePassLogin(context.Context, *PhonePassLoginRequest) (*LoginResponse, error)
+	EmailOrTtkPassLogin(context.Context, *EmailOrTTKPassLoginRequest) (*LoginResponse, error)
 	mustEmbedUnimplementedSsoServiceServer()
 }
 
@@ -184,17 +212,23 @@ type SsoServiceServer interface {
 type UnimplementedSsoServiceServer struct {
 }
 
-func (UnimplementedSsoServiceServer) SendPhoneVerificationCode(context.Context, *SendPhoneVerificationCodeRequest) (*SendPhoneVerificationCodeResponse, error) {
+func (UnimplementedSsoServiceServer) SendPhoneVerificationCode(context.Context, *SendPhoneVerificationCodeRequest) (*SendVerificationCodeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendPhoneVerificationCode not implemented")
 }
-func (UnimplementedSsoServiceServer) PhoneVerifyCodeLogin(context.Context, *PhoneVerifyCodeLoginRequest) (*PhoneVerifyCodeLoginResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PhoneVerifyCodeLogin not implemented")
-}
-func (UnimplementedSsoServiceServer) SendEmailVerificationCode(context.Context, *SendEmailVerificationCodeRequest) (*SendEmailVerificationCodeResponse, error) {
+func (UnimplementedSsoServiceServer) SendEmailVerificationCode(context.Context, *SendEmailVerificationCodeRequest) (*SendVerificationCodeResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendEmailVerificationCode not implemented")
 }
-func (UnimplementedSsoServiceServer) EmailVerifyCodeLogin(context.Context, *EmailVerifyCodeLoginRequest) (*EmailVerifyCodeLoginResponse, error) {
+func (UnimplementedSsoServiceServer) PhoneVerifyCodeLogin(context.Context, *PhoneVerifyCodeLoginRequest) (*LoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PhoneVerifyCodeLogin not implemented")
+}
+func (UnimplementedSsoServiceServer) EmailVerifyCodeLogin(context.Context, *EmailVerifyCodeLoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EmailVerifyCodeLogin not implemented")
+}
+func (UnimplementedSsoServiceServer) PhonePassLogin(context.Context, *PhonePassLoginRequest) (*LoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PhonePassLogin not implemented")
+}
+func (UnimplementedSsoServiceServer) EmailOrTtkPassLogin(context.Context, *EmailOrTTKPassLoginRequest) (*LoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EmailOrTtkPassLogin not implemented")
 }
 func (UnimplementedSsoServiceServer) mustEmbedUnimplementedSsoServiceServer() {}
 
@@ -227,24 +261,6 @@ func _SsoService_SendPhoneVerificationCode_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SsoService_PhoneVerifyCodeLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PhoneVerifyCodeLoginRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(SsoServiceServer).PhoneVerifyCodeLogin(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: SsoService_PhoneVerifyCodeLogin_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SsoServiceServer).PhoneVerifyCodeLogin(ctx, req.(*PhoneVerifyCodeLoginRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _SsoService_SendEmailVerificationCode_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SendEmailVerificationCodeRequest)
 	if err := dec(in); err != nil {
@@ -259,6 +275,24 @@ func _SsoService_SendEmailVerificationCode_Handler(srv interface{}, ctx context.
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SsoServiceServer).SendEmailVerificationCode(ctx, req.(*SendEmailVerificationCodeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SsoService_PhoneVerifyCodeLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PhoneVerifyCodeLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SsoServiceServer).PhoneVerifyCodeLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SsoService_PhoneVerifyCodeLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SsoServiceServer).PhoneVerifyCodeLogin(ctx, req.(*PhoneVerifyCodeLoginRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -281,6 +315,42 @@ func _SsoService_EmailVerifyCodeLogin_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SsoService_PhonePassLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PhonePassLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SsoServiceServer).PhonePassLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SsoService_PhonePassLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SsoServiceServer).PhonePassLogin(ctx, req.(*PhonePassLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SsoService_EmailOrTtkPassLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmailOrTTKPassLoginRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SsoServiceServer).EmailOrTtkPassLogin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SsoService_EmailOrTtkPassLogin_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SsoServiceServer).EmailOrTtkPassLogin(ctx, req.(*EmailOrTTKPassLoginRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SsoService_ServiceDesc is the grpc.ServiceDesc for SsoService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -293,16 +363,24 @@ var SsoService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _SsoService_SendPhoneVerificationCode_Handler,
 		},
 		{
-			MethodName: "PhoneVerifyCodeLogin",
-			Handler:    _SsoService_PhoneVerifyCodeLogin_Handler,
-		},
-		{
 			MethodName: "SendEmailVerificationCode",
 			Handler:    _SsoService_SendEmailVerificationCode_Handler,
 		},
 		{
+			MethodName: "PhoneVerifyCodeLogin",
+			Handler:    _SsoService_PhoneVerifyCodeLogin_Handler,
+		},
+		{
 			MethodName: "EmailVerifyCodeLogin",
 			Handler:    _SsoService_EmailVerifyCodeLogin_Handler,
+		},
+		{
+			MethodName: "PhonePassLogin",
+			Handler:    _SsoService_PhonePassLogin_Handler,
+		},
+		{
+			MethodName: "EmailOrTtkPassLogin",
+			Handler:    _SsoService_EmailOrTtkPassLogin_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

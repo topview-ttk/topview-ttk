@@ -22,22 +22,34 @@ func NewSsoServiceServer(svcCtx *svc.ServiceContext) *SsoServiceServer {
 	}
 }
 
-func (s *SsoServiceServer) SendPhoneVerificationCode(ctx context.Context, in *user.SendPhoneVerificationCodeRequest) (*user.SendPhoneVerificationCodeResponse, error) {
+// 发送验证码
+func (s *SsoServiceServer) SendPhoneVerificationCode(ctx context.Context, in *user.SendPhoneVerificationCodeRequest) (*user.SendVerificationCodeResponse, error) {
 	l := ssoservicelogic.NewSendPhoneVerificationCodeLogic(ctx, s.svcCtx)
 	return l.SendPhoneVerificationCode(in)
 }
 
-func (s *SsoServiceServer) PhoneVerifyCodeLogin(ctx context.Context, in *user.PhoneVerifyCodeLoginRequest) (*user.PhoneVerifyCodeLoginResponse, error) {
-	l := ssoservicelogic.NewPhoneVerifyCodeLoginLogic(ctx, s.svcCtx)
-	return l.PhoneVerifyCodeLogin(in)
-}
-
-func (s *SsoServiceServer) SendEmailVerificationCode(ctx context.Context, in *user.SendEmailVerificationCodeRequest) (*user.SendEmailVerificationCodeResponse, error) {
+func (s *SsoServiceServer) SendEmailVerificationCode(ctx context.Context, in *user.SendEmailVerificationCodeRequest) (*user.SendVerificationCodeResponse, error) {
 	l := ssoservicelogic.NewSendEmailVerificationCodeLogic(ctx, s.svcCtx)
 	return l.SendEmailVerificationCode(in)
 }
 
-func (s *SsoServiceServer) EmailVerifyCodeLogin(ctx context.Context, in *user.EmailVerifyCodeLoginRequest) (*user.EmailVerifyCodeLoginResponse, error) {
+// 登录
+func (s *SsoServiceServer) PhoneVerifyCodeLogin(ctx context.Context, in *user.PhoneVerifyCodeLoginRequest) (*user.LoginResponse, error) {
+	l := ssoservicelogic.NewPhoneVerifyCodeLoginLogic(ctx, s.svcCtx)
+	return l.PhoneVerifyCodeLogin(in)
+}
+
+func (s *SsoServiceServer) EmailVerifyCodeLogin(ctx context.Context, in *user.EmailVerifyCodeLoginRequest) (*user.LoginResponse, error) {
 	l := ssoservicelogic.NewEmailVerifyCodeLoginLogic(ctx, s.svcCtx)
 	return l.EmailVerifyCodeLogin(in)
+}
+
+func (s *SsoServiceServer) PhonePassLogin(ctx context.Context, in *user.PhonePassLoginRequest) (*user.LoginResponse, error) {
+	l := ssoservicelogic.NewPhonePassLoginLogic(ctx, s.svcCtx)
+	return l.PhonePassLogin(in)
+}
+
+func (s *SsoServiceServer) EmailOrTtkPassLogin(ctx context.Context, in *user.EmailOrTTKPassLoginRequest) (*user.LoginResponse, error) {
+	l := ssoservicelogic.NewEmailOrTtkPassLoginLogic(ctx, s.svcCtx)
+	return l.EmailOrTtkPassLogin(in)
 }

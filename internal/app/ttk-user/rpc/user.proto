@@ -3,12 +3,10 @@ syntax = "proto3";
 package user;
 option go_package = "./user";
 
-message Request {
-  string ping = 1;
-}
-
-message Response {
-  string pong = 1;
+enum StatusCode {
+  OK = 0;
+  INVALID_ARGUMENT = 1;
+  // 可以继续添加其他状态码
 }
 
 message UserInfo{
@@ -17,11 +15,21 @@ message UserInfo{
   string nick_name = 3;
 }
 
+message Request {
+  string ping = 1;
+}
+
+message Response {
+  string pong = 1;
+}
+
+
 service UserService {
   rpc Ping(Request) returns(Response);
 }
 
-
+// 发送验证码=====
+// 发送手机验证码
 message SendPhoneVerificationCodeRequest {
   string phone = 1;
   // 设备信息
@@ -30,26 +38,7 @@ message SendPhoneVerificationCodeRequest {
   string client_info = 3;
 }
 
-// 发送验证码响应
-message SendPhoneVerificationCodeResponse {
-  int32 status_code = 1;
-  string message = 2;
-}
-
-message PhoneVerifyCodeLoginRequest {
-  string phone = 1;
-  string verification_code = 2;
-  // 设备信息
-  string device_info = 3;
-  // 客户端版本
-  string client_info = 4;
-}
-message PhoneVerifyCodeLoginResponse {
-  int32 status_code = 1;
-  string message = 2;
-  UserInfo user_info = 3;
-}
-
+// 发送邮箱验证码
 message SendEmailVerificationCodeRequest {
   string email = 1;
   // 设备信息
@@ -59,11 +48,26 @@ message SendEmailVerificationCodeRequest {
 }
 
 // 发送验证码响应
-message SendEmailVerificationCodeResponse {
-  int32 status_code = 1;
+message SendVerificationCodeResponse {
+  StatusCode status_code = 1;
   string message = 2;
 }
+// 发送验证码=====
 
+
+
+// 登录=====
+// 手机验证码登录
+message PhoneVerifyCodeLoginRequest {
+  string phone = 1;
+  string verification_code = 2;
+  // 设备信息
+  string device_info = 3;
+  // 客户端版本
+  string client_info = 4;
+}
+
+// 邮箱验证码登录
 message EmailVerifyCodeLoginRequest {
   string email = 1;
   string verification_code = 2;
@@ -72,17 +76,45 @@ message EmailVerifyCodeLoginRequest {
   // 客户端版本
   string client_info = 4;
 }
-message EmailVerifyCodeLoginResponse {
-  int32 status_code = 1;
-  string message = 2;
-  UserInfo user_info = 3;
+
+// 手机密码登录
+message PhonePassLoginRequest {
+  string phone = 1;
+  string pass = 2;
+  // 设备信息
+  string device_info = 3;
+  // 客户端版本
+  string client_info = 4;
 }
 
-service SsoService{
-  rpc SendPhoneVerificationCode(SendPhoneVerificationCodeRequest) returns (SendPhoneVerificationCodeResponse);
-  rpc PhoneVerifyCodeLogin(PhoneVerifyCodeLoginRequest) returns (PhoneVerifyCodeLoginResponse);
+// 邮箱或ttkId登录
+message EmailOrTTKPassLoginRequest {
+  string email = 1;
+  string ttkId = 2;
+  string pass = 3;
+  // 设备信息
+  string device_info = 4;
+  // 客户端版本
+  string client_info = 5;
+}
 
-  rpc SendEmailVerificationCode(SendEmailVerificationCodeRequest) returns (SendEmailVerificationCodeResponse);
-  rpc EmailVerifyCodeLogin(EmailVerifyCodeLoginRequest) returns (EmailVerifyCodeLoginResponse);
+// 登录响应
+message LoginResponse {
+  StatusCode statusCode = 1;
+  string message = 2;
+  UserInfo userInfo = 3;
+}
+// 登录=====
+
+service SsoService{
+  // 发送验证码
+  rpc SendPhoneVerificationCode(SendPhoneVerificationCodeRequest) returns (SendVerificationCodeResponse);
+  rpc SendEmailVerificationCode(SendEmailVerificationCodeRequest) returns (SendVerificationCodeResponse);
+
+  // 登录
+  rpc PhoneVerifyCodeLogin(PhoneVerifyCodeLoginRequest) returns (LoginResponse);
+  rpc EmailVerifyCodeLogin(EmailVerifyCodeLoginRequest) returns (LoginResponse);
+  rpc PhonePassLogin(PhonePassLoginRequest) returns(LoginResponse);
+  rpc EmailOrTtkPassLogin(EmailOrTTKPassLoginRequest) returns(LoginResponse);
 }
 
