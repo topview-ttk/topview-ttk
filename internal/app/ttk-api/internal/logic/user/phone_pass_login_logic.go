@@ -10,34 +10,36 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type SendPhoneVerificationCodeLogic struct {
+type PhonePassLoginLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewSendPhoneVerificationCodeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SendPhoneVerificationCodeLogic {
-	return &SendPhoneVerificationCodeLogic{
+func NewPhonePassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PhonePassLoginLogic {
+	return &PhonePassLoginLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(req *types.SendPhoneVerificationCodeRequest) (resp *types.SendVerificationCodeResponse, err error) {
-	rpcResp, err := l.svcCtx.SsoClient.SendPhoneVerificationCode(l.ctx, &user.SendPhoneVerificationCodeRequest{
+func (l *PhonePassLoginLogic) PhonePassLogin(req *types.PhonePassLoginRequest) (resp *types.LoginResponse, err error) {
+	rpcResp, err := l.svcCtx.SsoClient.PhonePassLogin(l.ctx, &user.PhonePassLoginRequest{
 		Phone:      req.Phone,
+		Pass:       req.Password,
 		DeviceInfo: req.DeviceInfo,
 		ClientInfo: req.ClientInfo,
 	})
 
 	if err != nil {
 		logx.Error(err)
-		return &types.SendVerificationCodeResponse{}, err
+		return &types.LoginResponse{}, err
 	}
 
-	return &types.SendVerificationCodeResponse{
+	return &types.LoginResponse{
 		StatusCode: int32(rpcResp.GetStatusCode().Number()),
 		Message:    rpcResp.Message,
+		// todo User_info
 	}, err
 }

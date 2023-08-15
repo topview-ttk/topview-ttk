@@ -2,27 +2,55 @@
 package types
 
 type SendPhoneVerificationCodeRequest struct {
-	Phone       string `json:"phone"`
-	Device_info string `json:"device_info"`
-	Client_info string `json:"client_info"`
+	Phone      string `json:"phone"`
+	DeviceInfo string `json:"device_info"`
+	ClientInfo string `json:"client_info"`
 }
 
-type SendPhoneVerificationCodeResponse struct {
-	Status_code int32  `json:"status_code"`
-	Message     string `json:"message"`
+type SendEmailVerificationCodeRequest struct {
+	Email      string `json:"email"`
+	DeviceInfo string `json:"device_info"`
+	ClientInfo string `json:"client_info"`
+}
+
+type SendVerificationCodeResponse struct {
+	StatusCode int32  `json:"status_code"`
+	Message    string `json:"message"`
 }
 
 type PhoneVerifyCodeLoginRequest struct {
-	Phone             string `json:"phone"`
-	Verification_code string `json:"verification_code"`
-	Device_info       string `json:"device_info"`
-	Client_info       string `json:"client_info"`
+	Phone            string `json:"phone"`
+	VerificationCode string `json:"verification_code"`
+	DeviceInfo       string `json:"device_info"`
+	ClientInfo       string `json:"client_info"`
 }
 
-type PhoneVerifyCodeLoginResponse struct {
-	Status_code int32    `json:"status_code"`
-	Message     string   `json:"message"`
-	User_info   UserInfo `json:"user_info"`
+type EmailVerifyCodeLoginRequest struct {
+	Email            string `json:"email"`
+	VerificationCode string `json:"verification_code"`
+	DeviceInfo       string `json:"device_info"`
+	ClientInfo       string `json:"client_info"`
+}
+
+type PhonePassLoginRequest struct {
+	Phone      string `json:"phone"`
+	Password   string `json:"password"`
+	DeviceInfo string `json:"device_info"`
+	ClientInfo string `json:"client_info"`
+}
+
+type EmailOrTtkPassLoginRequest struct {
+	Email      string `json:"email"`
+	TtkId      string `json:"ttk_id"`
+	Password   string `json:"password"`
+	DeviceInfo string `json:"device_info"`
+	ClientInfo string `json:"client_info"`
+}
+
+type LoginResponse struct {
+	StatusCode int32    `json:"status_code"`
+	Message    string   `json:"message"`
+	UserInfo   UserInfo `json:"user_info"`
 }
 
 type UserInfo struct {

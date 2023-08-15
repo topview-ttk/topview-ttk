@@ -20,8 +20,28 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodPost,
+				Path:    "/sso/sendEmailVerificationCode",
+				Handler: user.SendEmailVerificationCodeHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
 				Path:    "/sso/phoneVerifyCodeLogin",
 				Handler: user.PhoneVerifyCodeLoginHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/sso/emailVerifyCodeLogin",
+				Handler: user.EmailVerifyCodeLoginHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/sso/phonePassLogin",
+				Handler: user.PhonePassLoginHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/sso/emailOrTtkPassLogin",
+				Handler: user.EmailOrTtkPassLoginHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/v1"),
