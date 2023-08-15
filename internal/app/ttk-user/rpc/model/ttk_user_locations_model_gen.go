@@ -19,8 +19,8 @@ import (
 var (
 	ttkUserLocationsFieldNames          = builder.RawFieldNames(&TtkUserLocations{})
 	ttkUserLocationsRows                = strings.Join(ttkUserLocationsFieldNames, ",")
-	ttkUserLocationsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserLocationsFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), ",")
-	ttkUserLocationsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserLocationsFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), "=?,") + "=?"
+	ttkUserLocationsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserLocationsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
+	ttkUserLocationsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserLocationsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkUserLocationsIdPrefix = "cache:ttkUserLocations:id:"
 )
@@ -93,8 +93,8 @@ func (m *defaultTtkUserLocationsModel) FindOne(ctx context.Context, id int64) (*
 func (m *defaultTtkUserLocationsModel) Insert(ctx context.Context, data *TtkUserLocations) (sql.Result, error) {
 	ttkUserLocationsIdKey := fmt.Sprintf("%s%v", cacheTtkUserLocationsIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?)", m.table, ttkUserLocationsRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.Latitude, data.Longitude, data.LocationName, data.UpdatedAt, data.DeletedAt)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, ttkUserLocationsRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.Latitude, data.Longitude, data.LocationName)
 	}, ttkUserLocationsIdKey)
 	return ret, err
 }
@@ -103,7 +103,7 @@ func (m *defaultTtkUserLocationsModel) Update(ctx context.Context, data *TtkUser
 	ttkUserLocationsIdKey := fmt.Sprintf("%s%v", cacheTtkUserLocationsIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkUserLocationsRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.Latitude, data.Longitude, data.LocationName, data.UpdatedAt, data.DeletedAt, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.Latitude, data.Longitude, data.LocationName, data.Id)
 	}, ttkUserLocationsIdKey)
 	return err
 }

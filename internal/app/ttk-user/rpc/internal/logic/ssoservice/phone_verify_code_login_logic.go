@@ -27,14 +27,14 @@ func NewPhoneVerifyCodeLoginLogic(ctx context.Context, svcCtx *svc.ServiceContex
 	}
 }
 
-func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(in *user.PhoneVerifyCodeLoginRequest) (*user.PhoneVerifyCodeLoginResponse, error) {
+func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(in *user.PhoneVerifyCodeLoginRequest) (*user.LoginResponse, error) {
 	isValid := util.ValidatePhoneNumber(in.GetPhone())
 
 	if !isValid {
 		return handlePhoneLoginError("请输入正确的手机号码，当前手机号码不合法"), nil
 	}
 
-	code, err := l.svcCtx.Rdb.Get(l.ctx, "verification:"+in.GetPhone()).Result()
+	code, err := l.svcCtx.Rdb.GetDel(l.ctx, "verification:"+in.GetPhone()).Result()
 	if err != nil {
 		return handlePhoneLoginError("系统繁忙或者验证码不存在，请重新发送验证码"), err
 	}
@@ -44,25 +44,26 @@ func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(in *user.PhoneVerifyCod
 	}
 	userInfo, err := l.svcCtx.TtkUserInfoModel.FindOneByPhone(l.ctx, in.GetPhone())
 	if err != nil && errors.Is(err, sqlc.ErrNotFound) {
-		// todo 后续添加随机ttk_id机制，或许求hash？
 		userInfo = login.CreateDefaultUserInfo()
 		userInfo.Phone = sql.NullString{String: in.GetPhone(), Valid: true}
-		r, err := l.svcCtx.TtkUserInfoModel.Insert(l.ctx, userInfo)
+		_, err := l.svcCtx.TtkUserInfoModel.Insert(l.ctx, userInfo)
 		if err != nil {
 			logx.Error(err)
-			return handlePhoneLoginError("网络繁忙，请重试尝试登录"), err
-		} else if a, _ := r.RowsAffected(); a != 1 {
-			err = errors.New("数据库插入失败")
+			return handleEmailLoginError("网络繁忙，请重试尝试登录"), err
+		}
+		// 为了进行缓存用户数据，需要查询数据库，如果err大概率插入失败，让用户重新登录
+		userInfo, err = l.svcCtx.TtkUserInfoModel.FindOneByPhone(l.ctx, in.GetPhone())
+		if err != nil {
 			logx.Error(err)
-			return handlePhoneLoginError("网络繁忙，请重试尝试登录"), err
+			return handleEmailLoginError("网络繁忙，请重试尝试登录"), err
 		}
 	} else if err != nil {
 		logx.Error(err)
 		return handlePhoneLoginError("网络繁忙，请重试尝试登录"), err
 	}
 
-	return &user.PhoneVerifyCodeLoginResponse{
-		StatusCode: 0,
+	return &user.LoginResponse{
+		StatusCode: user.StatusCode_OK,
 		Message:    "登录成功，正在加载",
 		UserInfo: &user.UserInfo{
 			Id:       userInfo.Id,
@@ -72,9 +73,9 @@ func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(in *user.PhoneVerifyCod
 	}, nil
 }
 
-func handlePhoneLoginError(message string) *user.PhoneVerifyCodeLoginResponse {
-	return &user.PhoneVerifyCodeLoginResponse{
-		StatusCode: 1,
+func handlePhoneLoginError(message string) *user.LoginResponse {
+	return &user.LoginResponse{
+		StatusCode: user.StatusCode_INVALID_ARGUMENT,
 		Message:    message,
 	}
 }

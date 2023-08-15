@@ -19,8 +19,8 @@ import (
 var (
 	ttkLoginStatusFieldNames          = builder.RawFieldNames(&TtkLoginStatus{})
 	ttkLoginStatusRows                = strings.Join(ttkLoginStatusFieldNames, ",")
-	ttkLoginStatusRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkLoginStatusFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), ",")
-	ttkLoginStatusRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkLoginStatusFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), "=?,") + "=?"
+	ttkLoginStatusRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkLoginStatusFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
+	ttkLoginStatusRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkLoginStatusFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkLoginStatusIdPrefix = "cache:ttkLoginStatus:id:"
 )
@@ -95,8 +95,8 @@ func (m *defaultTtkLoginStatusModel) FindOne(ctx context.Context, id int64) (*Tt
 func (m *defaultTtkLoginStatusModel) Insert(ctx context.Context, data *TtkLoginStatus) (sql.Result, error) {
 	ttkLoginStatusIdKey := fmt.Sprintf("%s%v", cacheTtkLoginStatusIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?)", m.table, ttkLoginStatusRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.AccessToken, data.ExpiresAt, data.LoginMethod, data.ThirdPartyType, data.ThirdPartyAccessToken, data.UpdatedAt, data.DeletedAt)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?)", m.table, ttkLoginStatusRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.AccessToken, data.ExpiresAt, data.LoginMethod, data.ThirdPartyType, data.ThirdPartyAccessToken)
 	}, ttkLoginStatusIdKey)
 	return ret, err
 }
@@ -105,7 +105,7 @@ func (m *defaultTtkLoginStatusModel) Update(ctx context.Context, data *TtkLoginS
 	ttkLoginStatusIdKey := fmt.Sprintf("%s%v", cacheTtkLoginStatusIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkLoginStatusRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.AccessToken, data.ExpiresAt, data.LoginMethod, data.ThirdPartyType, data.ThirdPartyAccessToken, data.UpdatedAt, data.DeletedAt, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.AccessToken, data.ExpiresAt, data.LoginMethod, data.ThirdPartyType, data.ThirdPartyAccessToken, data.Id)
 	}, ttkLoginStatusIdKey)
 	return err
 }

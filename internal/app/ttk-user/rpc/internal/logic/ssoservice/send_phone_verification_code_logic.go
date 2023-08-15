@@ -25,18 +25,18 @@ func NewSendPhoneVerificationCodeLogic(ctx context.Context, svcCtx *svc.ServiceC
 	}
 }
 
-func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(in *user.SendPhoneVerificationCodeRequest) (*user.SendPhoneVerificationCodeResponse, error) {
+func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(in *user.SendPhoneVerificationCodeRequest) (*user.SendVerificationCodeResponse, error) {
 	isValid := util.ValidatePhoneNumber(in.GetPhone())
 
 	if !isValid {
-		return &user.SendPhoneVerificationCodeResponse{
+		return &user.SendVerificationCodeResponse{
 			StatusCode: 1,
 			Message:    "请输入正确的手机号码，当前手机号码不合法",
 		}, nil
 	}
 
 	if !send.CanSendVerificationCode(l.ctx, l.svcCtx.Rdb, in.GetPhone()) {
-		return &user.SendPhoneVerificationCodeResponse{
+		return &user.SendVerificationCodeResponse{
 			StatusCode: 1,
 			Message:    "请求过多或网络繁忙，请重试尝试",
 		}, nil
@@ -48,7 +48,7 @@ func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(in *user.Send
 	if err != nil {
 		logx.Error(err)
 	}
-	return &user.SendPhoneVerificationCodeResponse{
+	return &user.SendVerificationCodeResponse{
 		StatusCode: 0,
 		Message:    "验证码已发送，请注意查收",
 	}, nil

@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
@@ -10,6 +11,13 @@ import (
 
 var _ TtkUserInfoModel = (*customTtkUserInfoModel)(nil)
 
+var (
+	userCredentialsSet                 = "id,password,salt"
+	cacheTtkUserCredentialsEmailPrefix = "cache:ttkUserCredentials:email:"
+	cacheTtkUserCredentialsPhonePrefix = "cache:ttkUserCredentials:phone:"
+	cacheTtkUserCredentialsTtkIdPrefix = "cache:ttkUserCredentials:ttkId:"
+)
+
 type (
 	// TtkUserInfoModel is an interface to be customized, add more methods here,
 	// and implement the added methods in customTtkUserInfoModel.
@@ -17,6 +25,15 @@ type (
 		ttkUserInfoModel
 		FindOneByPhone(ctx context.Context, phone string) (*TtkUserInfo, error)
 		FindOneByEmail(ctx context.Context, email string) (*TtkUserInfo, error)
+		FindUserCredentialsByEmail(ctx context.Context, email string) (*TtkUserCredentials, error)
+		FindUserCredentialsByTtkId(ctx context.Context, email string) (*TtkUserCredentials, error)
+		FindUserCredentialsByPhone(ctx context.Context, email string) (*TtkUserCredentials, error)
+	}
+
+	TtkUserCredentials struct {
+		Id       int64          `db:"id"`       // 用户ID (主键)
+		Password string         `db:"password"` // 密码（加密存储）
+		Salt     sql.NullString `db:"salt"`     // 密码（加密存储）
 	}
 
 	customTtkUserInfoModel struct {
@@ -33,10 +50,7 @@ func NewTtkUserInfoModel(conn sqlx.SqlConn, c cache.CacheConf, opts ...cache.Opt
 
 func (m *customTtkUserInfoModel) FindOneByPhone(ctx context.Context, phone string) (*TtkUserInfo, error) {
 	var resp TtkUserInfo
-	err := m.QueryRowCtx(ctx, &resp, phone, func(ctx context.Context, conn sqlx.SqlConn, v any) error {
-		query := fmt.Sprintf("select %s from %s where `phone` = ? limit 1", ttkUserInfoRowsExpectAutoSet, m.table)
-		return conn.QueryRowPartialCtx(ctx, v, query, phone)
-	})
+	err := m.QueryRowNoCacheCtx(ctx, &resp, fmt.Sprintf("select %s from %s where `phone` = ? limit 1", ttkUserInfoRows, m.table), phone)
 	switch err {
 	case nil:
 		return &resp, nil
@@ -49,9 +63,56 @@ func (m *customTtkUserInfoModel) FindOneByPhone(ctx context.Context, phone strin
 
 func (m *customTtkUserInfoModel) FindOneByEmail(ctx context.Context, email string) (*TtkUserInfo, error) {
 	var resp TtkUserInfo
-	err := m.QueryRowCtx(ctx, &resp, email, func(ctx context.Context, conn sqlx.SqlConn, v any) error {
-		query := fmt.Sprintf("select %s from %s where `email` = ? limit 1", ttkUserInfoRowsExpectAutoSet, m.table)
+	err := m.QueryRowNoCacheCtx(ctx, &resp, fmt.Sprintf("select %s from %s where `email` = ? limit 1", ttkUserInfoRows, m.table), email)
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *customTtkUserInfoModel) FindUserCredentialsByEmail(ctx context.Context, email string) (*TtkUserCredentials, error) {
+	var resp TtkUserCredentials
+	ttkUserCredentialsKey := fmt.Sprintf("%s%v", cacheTtkUserCredentialsEmailPrefix, email)
+	err := m.QueryRowCtx(ctx, &resp, ttkUserCredentialsKey, func(ctx context.Context, conn sqlx.SqlConn, v any) error {
+		query := fmt.Sprintf("select %s from %s where `email` = ? limit 1", userCredentialsSet, m.table)
 		return conn.QueryRowPartialCtx(ctx, v, query, email)
+	})
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *customTtkUserInfoModel) FindUserCredentialsByTtkId(ctx context.Context, ttkId string) (*TtkUserCredentials, error) {
+	var resp TtkUserCredentials
+	ttkUserCredentialsKey := fmt.Sprintf("%s%v", cacheTtkUserCredentialsTtkIdPrefix, ttkId)
+	err := m.QueryRowCtx(ctx, &resp, ttkUserCredentialsKey, func(ctx context.Context, conn sqlx.SqlConn, v any) error {
+		query := fmt.Sprintf("select %s from %s where `ttk_id` = ? limit 1", userCredentialsSet, m.table)
+		return conn.QueryRowPartialCtx(ctx, v, query, ttkId)
+	})
+	switch err {
+	case nil:
+		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+func (m *customTtkUserInfoModel) FindUserCredentialsByPhone(ctx context.Context, phone string) (*TtkUserCredentials, error) {
+	var resp TtkUserCredentials
+	ttkUserCredentialsKey := fmt.Sprintf("%s%v", cacheTtkUserCredentialsPhonePrefix, phone)
+	err := m.QueryRowCtx(ctx, &resp, ttkUserCredentialsKey, func(ctx context.Context, conn sqlx.SqlConn, v any) error {
+		query := fmt.Sprintf("select %s from %s where `phone` = ? limit 1", userCredentialsSet, m.table)
+		return conn.QueryRowPartialCtx(ctx, v, query, phone)
 	})
 	switch err {
 	case nil:

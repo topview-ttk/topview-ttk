@@ -19,8 +19,8 @@ import (
 var (
 	ttkThirdPartyBindingFieldNames          = builder.RawFieldNames(&TtkThirdPartyBinding{})
 	ttkThirdPartyBindingRows                = strings.Join(ttkThirdPartyBindingFieldNames, ",")
-	ttkThirdPartyBindingRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkThirdPartyBindingFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), ",")
-	ttkThirdPartyBindingRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkThirdPartyBindingFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), "=?,") + "=?"
+	ttkThirdPartyBindingRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkThirdPartyBindingFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
+	ttkThirdPartyBindingRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkThirdPartyBindingFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkThirdPartyBindingIdPrefix = "cache:ttkThirdPartyBinding:id:"
 )
@@ -92,8 +92,8 @@ func (m *defaultTtkThirdPartyBindingModel) FindOne(ctx context.Context, id int64
 func (m *defaultTtkThirdPartyBindingModel) Insert(ctx context.Context, data *TtkThirdPartyBinding) (sql.Result, error) {
 	ttkThirdPartyBindingIdKey := fmt.Sprintf("%s%v", cacheTtkThirdPartyBindingIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?)", m.table, ttkThirdPartyBindingRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.ThirdPartyBindingType, data.ThirdPartyId, data.UpdatedAt, data.DeletedAt)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, ttkThirdPartyBindingRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.ThirdPartyBindingType, data.ThirdPartyId)
 	}, ttkThirdPartyBindingIdKey)
 	return ret, err
 }
@@ -102,7 +102,7 @@ func (m *defaultTtkThirdPartyBindingModel) Update(ctx context.Context, data *Ttk
 	ttkThirdPartyBindingIdKey := fmt.Sprintf("%s%v", cacheTtkThirdPartyBindingIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkThirdPartyBindingRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.ThirdPartyBindingType, data.ThirdPartyId, data.UpdatedAt, data.DeletedAt, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.ThirdPartyBindingType, data.ThirdPartyId, data.Id)
 	}, ttkThirdPartyBindingIdKey)
 	return err
 }

@@ -7,11 +7,13 @@ require (
 	github.com/alibabacloud-go/dysmsapi-20170525/v3 v3.0.6
 	github.com/alibabacloud-go/tea v1.2.1
 	github.com/alibabacloud-go/tea-utils/v2 v2.0.3
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/sirupsen/logrus v1.9.3
 	github.com/tencentcloud/tencentcloud-sdk-go v3.0.233+incompatible
 	github.com/zeromicro/go-queue v1.1.8
 	github.com/zeromicro/go-zero v1.5.4
+	golang.org/x/crypto v0.12.0
 	google.golang.org/grpc v1.57.0
 	google.golang.org/protobuf v1.31.0
 	gopkg.in/yaml.v3 v3.0.1

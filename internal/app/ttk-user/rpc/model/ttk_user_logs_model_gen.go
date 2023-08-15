@@ -19,8 +19,8 @@ import (
 var (
 	ttkUserLogsFieldNames          = builder.RawFieldNames(&TtkUserLogs{})
 	ttkUserLogsRows                = strings.Join(ttkUserLogsFieldNames, ",")
-	ttkUserLogsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserLogsFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), ",")
-	ttkUserLogsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserLogsFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), "=?,") + "=?"
+	ttkUserLogsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserLogsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
+	ttkUserLogsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserLogsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkUserLogsIdPrefix = "cache:ttkUserLogs:id:"
 )
@@ -93,8 +93,8 @@ func (m *defaultTtkUserLogsModel) FindOne(ctx context.Context, id int64) (*TtkUs
 func (m *defaultTtkUserLogsModel) Insert(ctx context.Context, data *TtkUserLogs) (sql.Result, error) {
 	ttkUserLogsIdKey := fmt.Sprintf("%s%v", cacheTtkUserLogsIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?)", m.table, ttkUserLogsRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.LogType, data.LogDetails, data.Timestamp, data.UpdatedAt, data.DeletedAt)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, ttkUserLogsRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.LogType, data.LogDetails, data.Timestamp)
 	}, ttkUserLogsIdKey)
 	return ret, err
 }
@@ -103,7 +103,7 @@ func (m *defaultTtkUserLogsModel) Update(ctx context.Context, data *TtkUserLogs)
 	ttkUserLogsIdKey := fmt.Sprintf("%s%v", cacheTtkUserLogsIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkUserLogsRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.LogType, data.LogDetails, data.Timestamp, data.UpdatedAt, data.DeletedAt, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.LogType, data.LogDetails, data.Timestamp, data.Id)
 	}, ttkUserLogsIdKey)
 	return err
 }

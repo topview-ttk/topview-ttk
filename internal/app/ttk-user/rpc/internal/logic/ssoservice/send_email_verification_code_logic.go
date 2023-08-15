@@ -26,22 +26,22 @@ func NewSendEmailVerificationCodeLogic(ctx context.Context, svcCtx *svc.ServiceC
 	}
 }
 
-func (l *SendEmailVerificationCodeLogic) SendEmailVerificationCode(in *user.SendEmailVerificationCodeRequest) (*user.SendEmailVerificationCodeResponse, error) {
+func (l *SendEmailVerificationCodeLogic) SendEmailVerificationCode(in *user.SendEmailVerificationCodeRequest) (*user.SendVerificationCodeResponse, error) {
 	isValid := util.ValidateEmail(in.GetEmail())
 
 	if !isValid {
-		return &user.SendEmailVerificationCodeResponse{
+		return &user.SendVerificationCodeResponse{
 			StatusCode: 1,
 			Message:    "请输入正确的邮箱，当前邮箱不合法",
 		}, nil
 	}
 
-	//if !send.CanSendVerificationCode(l.ctx, l.svcCtx.Rdb, in.GetEmail()) {
-	//	return &user.SendEmailVerificationCodeResponse{
-	//		StatusCode: 1,
-	//		Message:    "请求过多或网络繁忙，请重试尝试",
-	//	}, nil
-	//}
+	if !send.CanSendVerificationCode(l.ctx, l.svcCtx.Rdb, in.GetEmail()) {
+		return &user.SendVerificationCodeResponse{
+			StatusCode: 1,
+			Message:    "请求过多或网络繁忙，请重试尝试",
+		}, nil
+	}
 
 	code := send.GenerateVerificationCode()
 	send.StoreVerificationCode(l.ctx, l.svcCtx.Rdb, in.GetEmail(), code)
@@ -50,7 +50,7 @@ func (l *SendEmailVerificationCodeLogic) SendEmailVerificationCode(in *user.Send
 		fmt.Println(err)
 		logx.Error(err)
 	}
-	return &user.SendEmailVerificationCodeResponse{
+	return &user.SendVerificationCodeResponse{
 		StatusCode: 0,
 		Message:    "验证码已发送，请注意查收",
 	}, nil

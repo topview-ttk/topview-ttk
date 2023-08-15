@@ -19,8 +19,8 @@ import (
 var (
 	ttkUserInfoFieldNames          = builder.RawFieldNames(&TtkUserInfo{})
 	ttkUserInfoRows                = strings.Join(ttkUserInfoFieldNames, ",")
-	ttkUserInfoRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserInfoFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), ",")
-	ttkUserInfoRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserInfoFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), "=?,") + "=?"
+	ttkUserInfoRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserInfoFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
+	ttkUserInfoRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserInfoFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkUserInfoIdPrefix    = "cache:ttkUserInfo:id:"
 	cacheTtkUserInfoTtkIdPrefix = "cache:ttkUserInfo:ttkId:"
@@ -44,6 +44,7 @@ type (
 		Id                  int64          `db:"id"`                    // 用户ID (主键)
 		TtkId               string         `db:"ttk_id"`                // 用户名（唯一）
 		Password            string         `db:"password"`              // 密码（加密存储）
+		Salt                sql.NullString `db:"salt"`                  // 密码（加密存储）
 		NickName            sql.NullString `db:"nick_name"`             // 昵称（可修改,用于显示和@提及）
 		RealName            sql.NullString `db:"real_name"`             // 真实姓名（实名认证）
 		IdCard              sql.NullString `db:"id_card"`               // 身份证ID （实名认证）
@@ -145,8 +146,8 @@ func (m *defaultTtkUserInfoModel) Insert(ctx context.Context, data *TtkUserInfo)
 	ttkUserInfoIdKey := fmt.Sprintf("%s%v", cacheTtkUserInfoIdPrefix, data.Id)
 	ttkUserInfoTtkIdKey := fmt.Sprintf("%s%v", cacheTtkUserInfoTtkIdPrefix, data.TtkId)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, ttkUserInfoRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.TtkId, data.Password, data.NickName, data.RealName, data.IdCard, data.Gender, data.Birthdate, data.AvatarPath, data.Bio, data.Country, data.City, data.Followers, data.Following, data.Videos, data.PrivateAccount, data.PushNotifications, data.Email, data.Phone, data.VerificationStatus, data.AccountStatus, data.RegistrationSource, data.RegistrationIp, data.LastActive, data.WalletBalance, data.MessagingPermission, data.TfaEnable, data.SocialActivityScore, data.UpdatedAt, data.DeletedAt)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, ttkUserInfoRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.TtkId, data.Password, data.Salt, data.NickName, data.RealName, data.IdCard, data.Gender, data.Birthdate, data.AvatarPath, data.Bio, data.Country, data.City, data.Followers, data.Following, data.Videos, data.PrivateAccount, data.PushNotifications, data.Email, data.Phone, data.VerificationStatus, data.AccountStatus, data.RegistrationSource, data.RegistrationIp, data.LastActive, data.WalletBalance, data.MessagingPermission, data.TfaEnable, data.SocialActivityScore)
 	}, ttkUserInfoIdKey, ttkUserInfoTtkIdKey)
 	return ret, err
 }
@@ -161,7 +162,7 @@ func (m *defaultTtkUserInfoModel) Update(ctx context.Context, newData *TtkUserIn
 	ttkUserInfoTtkIdKey := fmt.Sprintf("%s%v", cacheTtkUserInfoTtkIdPrefix, data.TtkId)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkUserInfoRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, newData.TtkId, newData.Password, newData.NickName, newData.RealName, newData.IdCard, newData.Gender, newData.Birthdate, newData.AvatarPath, newData.Bio, newData.Country, newData.City, newData.Followers, newData.Following, newData.Videos, newData.PrivateAccount, newData.PushNotifications, newData.Email, newData.Phone, newData.VerificationStatus, newData.AccountStatus, newData.RegistrationSource, newData.RegistrationIp, newData.LastActive, newData.WalletBalance, newData.MessagingPermission, newData.TfaEnable, newData.SocialActivityScore, newData.UpdatedAt, newData.DeletedAt, newData.Id)
+		return conn.ExecCtx(ctx, query, newData.TtkId, newData.Password, newData.Salt, newData.NickName, newData.RealName, newData.IdCard, newData.Gender, newData.Birthdate, newData.AvatarPath, newData.Bio, newData.Country, newData.City, newData.Followers, newData.Following, newData.Videos, newData.PrivateAccount, newData.PushNotifications, newData.Email, newData.Phone, newData.VerificationStatus, newData.AccountStatus, newData.RegistrationSource, newData.RegistrationIp, newData.LastActive, newData.WalletBalance, newData.MessagingPermission, newData.TfaEnable, newData.SocialActivityScore, newData.Id)
 	}, ttkUserInfoIdKey, ttkUserInfoTtkIdKey)
 	return err
 }

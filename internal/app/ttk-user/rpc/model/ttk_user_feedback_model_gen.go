@@ -19,8 +19,8 @@ import (
 var (
 	ttkUserFeedbackFieldNames          = builder.RawFieldNames(&TtkUserFeedback{})
 	ttkUserFeedbackRows                = strings.Join(ttkUserFeedbackFieldNames, ",")
-	ttkUserFeedbackRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserFeedbackFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), ",")
-	ttkUserFeedbackRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserFeedbackFieldNames, "`id`", "`create_at`", "`created_at`", "`delete_at`", "`update_at`"), "=?,") + "=?"
+	ttkUserFeedbackRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserFeedbackFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
+	ttkUserFeedbackRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserFeedbackFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkUserFeedbackIdPrefix = "cache:ttkUserFeedback:id:"
 )
@@ -92,8 +92,8 @@ func (m *defaultTtkUserFeedbackModel) FindOne(ctx context.Context, id int64) (*T
 func (m *defaultTtkUserFeedbackModel) Insert(ctx context.Context, data *TtkUserFeedback) (sql.Result, error) {
 	ttkUserFeedbackIdKey := fmt.Sprintf("%s%v", cacheTtkUserFeedbackIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?)", m.table, ttkUserFeedbackRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.FeedbackText, data.Timestamp, data.UpdatedAt, data.DeletedAt)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, ttkUserFeedbackRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.FeedbackText, data.Timestamp)
 	}, ttkUserFeedbackIdKey)
 	return ret, err
 }
@@ -102,7 +102,7 @@ func (m *defaultTtkUserFeedbackModel) Update(ctx context.Context, data *TtkUserF
 	ttkUserFeedbackIdKey := fmt.Sprintf("%s%v", cacheTtkUserFeedbackIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkUserFeedbackRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.FeedbackText, data.Timestamp, data.UpdatedAt, data.DeletedAt, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.FeedbackText, data.Timestamp, data.Id)
 	}, ttkUserFeedbackIdKey)
 	return err
 }
