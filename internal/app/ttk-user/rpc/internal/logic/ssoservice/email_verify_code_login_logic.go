@@ -62,9 +62,19 @@ func (l *EmailVerifyCodeLoginLogic) EmailVerifyCodeLogin(in *user.EmailVerifyCod
 		return handleEmailLoginError("网络繁忙，请重试尝试登录"), err
 	}
 
+	token, err := login.GenerateVfToken(in.DeviceInfo, in.ClientInfo, userInfo.Id)
+
+	if err != nil {
+		logx.Error(err)
+		return &user.LoginResponse{
+			StatusCode: user.StatusCode_INVALID_ARGUMENT,
+			Message:    "系统繁忙，请重试！",
+		}, nil
+	}
 	return &user.LoginResponse{
 		StatusCode: user.StatusCode_OK,
 		Message:    "登录成功，正在加载",
+		Token:      token,
 		UserInfo: &user.UserInfo{
 			Id:       userInfo.Id,
 			UserName: userInfo.TtkId,

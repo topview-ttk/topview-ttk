@@ -29,7 +29,6 @@ func NewEmailRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ema
 // 注册
 func (l *EmailRegisterLogic) EmailRegister(in *user.EmailRegisterRequest) (*user.RegisterResponse, error) {
 	// todo: add your logic here and delete this line
-
 	email := in.GetEmail()
 	var userCredentials *model.TtkUserCredentials
 	var err error

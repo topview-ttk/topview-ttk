@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"topview-ttk/internal/app/ttk-user/rpc/internal/logic/ssoservice/login"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/svc"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
 
@@ -36,11 +37,11 @@ func NewGithubLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Githu
 }
 
 func (l *GithubLoginLogic) GithubLogin(in *user.GitHubLoginRequest) (*user.LoginResponse, error) {
-	token := in.GetToken()
+	githubToken := in.GetToken()
 
 	url := "https://api.github.com/user"
 	headers := map[string]string{
-		"Authorization": token,
+		"Authorization": githubToken,
 	}
 
 	req, err := http.NewRequest("GET", url, nil)
@@ -96,7 +97,7 @@ func (l *GithubLoginLogic) GithubLogin(in *user.GitHubLoginRequest) (*user.Login
 
 	//***************************************************************************
 	// 通过GithubID来查找user， 查找接口需要重新写
-	_, err = l.svcCtx.TtkUserInfoModel.FindOne(l.ctx, githubUserInfo.ID)
+	userInfo, err := l.svcCtx.TtkUserInfoModel.FindOne(l.ctx, githubUserInfo.ID)
 
 	if err != nil {
 		/***************************************************************************
@@ -109,13 +110,22 @@ func (l *GithubLoginLogic) GithubLogin(in *user.GitHubLoginRequest) (*user.Login
 	// 注册完成后，再次进行登录
 	//***************************************************************************
 
+	token, err := login.GenerateVfToken(in.DeviceInfo, in.ClientInfo, userInfo.Id)
+	if err != nil {
+		logx.Error(err)
+		return &user.LoginResponse{
+			StatusCode: user.StatusCode_INVALID_ARGUMENT,
+			Message:    "系统繁忙，请重试！",
+		}, nil
+	}
 	return &user.LoginResponse{
 		StatusCode: user.StatusCode_OK,
-		Message:    "登录成功，正在加载...User为" + githubUserInfo.Nickname,
-		UserInfo:   &user.UserInfo{
-			//Id:       userInfo.Id,
-			//UserName: userInfo.TtkId,
-			//NickName: userInfo.NickName.String,
+		Message:    "登录成功，正在加载",
+		Token:      token,
+		UserInfo: &user.UserInfo{
+			Id:       userInfo.Id,
+			UserName: userInfo.TtkId,
+			NickName: userInfo.NickName.String,
 		},
 	}, nil
 }

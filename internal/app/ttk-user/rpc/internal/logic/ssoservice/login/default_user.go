@@ -2,24 +2,18 @@ package login
 
 import (
 	"database/sql"
-	"fmt"
-	"github.com/bwmarrin/snowflake"
 	"math/big"
 	"math/rand"
 	"strconv"
-	"sync"
 	"time"
 	"topview-ttk/internal/app/ttk-user/rpc/model"
+	"topview-ttk/internal/pkg/common"
 )
 
 // 定义64进制
 const alphabet = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_!"
 
-var (
-	base = big.NewInt(int64(len(alphabet)))
-	once sync.Once
-	node *snowflake.Node
-)
+var base = big.NewInt(int64(len(alphabet)))
 
 // CreateDefaultUserInfo 创建默认的用户角色 todo
 func CreateDefaultUserInfo() *model.TtkUserInfo {
@@ -32,14 +26,6 @@ func CreateDefaultUserInfo() *model.TtkUserInfo {
 		NickName:  sql.NullString{String: strconv.FormatInt(time.Now().Unix(), 10), Valid: true},
 		UpdatedAt: time.Now(),
 	}
-}
-
-func initSnowflakeNode() (*snowflake.Node, error) {
-	var err error
-	once.Do(func() {
-		node, err = snowflake.NewNode(1)
-	})
-	return node, err
 }
 
 func ConvertToTTKBase64(input string) (string, error) {
@@ -67,13 +53,8 @@ func reverseString(str string) string {
 }
 
 func createTTKId() (string, error) {
-	node, err := initSnowflakeNode()
-	if err != nil {
-		return "", err
-	}
-	fmt.Println(node)
-	id := node.Generate()
-	ttkBase64, err := ConvertToTTKBase64(id.String())
+	id := common.GenerateSnowflakeIdString()
+	ttkBase64, err := ConvertToTTKBase64(id)
 	if err != nil {
 		return "", err
 	}
