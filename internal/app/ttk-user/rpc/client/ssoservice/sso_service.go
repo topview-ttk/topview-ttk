@@ -16,14 +16,17 @@ type (
 	EmailPassLoginRequest            = user.EmailPassLoginRequest
 	EmailRegisterRequest             = user.EmailRegisterRequest
 	EmailVerifyCodeLoginRequest      = user.EmailVerifyCodeLoginRequest
+	GetUserInfoByTTKIdRequest        = user.GetUserInfoByTTKIdRequest
+	GetUserInfoByUidRequest          = user.GetUserInfoByUidRequest
+	GetUserInfoResponse              = user.GetUserInfoResponse
 	GitHubLoginRequest               = user.GitHubLoginRequest
 	LoginResponse                    = user.LoginResponse
 	PhonePassLoginRequest            = user.PhonePassLoginRequest
 	PhoneRegisterRequest             = user.PhoneRegisterRequest
 	PhoneVerifyCodeLoginRequest      = user.PhoneVerifyCodeLoginRequest
+	RefreshTokenRequest              = user.RefreshTokenRequest
+	RefreshTokenResponse             = user.RefreshTokenResponse
 	RegisterResponse                 = user.RegisterResponse
-	Request                          = user.Request
-	Response                         = user.Response
 	SendEmailVerificationCodeRequest = user.SendEmailVerificationCodeRequest
 	SendPhoneVerificationCodeRequest = user.SendPhoneVerificationCodeRequest
 	SendVerificationCodeResponse     = user.SendVerificationCodeResponse
@@ -44,6 +47,7 @@ type (
 		// 注册
 		EmailRegister(ctx context.Context, in *EmailRegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 		PhoneRegister(ctx context.Context, in *PhoneRegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
+		RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*RefreshTokenResponse, error)
 	}
 
 	defaultSsoService struct {
@@ -108,4 +112,9 @@ func (m *defaultSsoService) EmailRegister(ctx context.Context, in *EmailRegister
 func (m *defaultSsoService) PhoneRegister(ctx context.Context, in *PhoneRegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
 	client := user.NewSsoServiceClient(m.cli.Conn())
 	return client.PhoneRegister(ctx, in, opts...)
+}
+
+func (m *defaultSsoService) RefreshToken(ctx context.Context, in *RefreshTokenRequest, opts ...grpc.CallOption) (*RefreshTokenResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.RefreshToken(ctx, in, opts...)
 }

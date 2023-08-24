@@ -5,6 +5,7 @@ import (
 	"fmt"
 	ssoserver "topview-ttk/internal/app/ttk-user/rpc/internal/server/ssoservice"
 	userserver "topview-ttk/internal/app/ttk-user/rpc/internal/server/userservice"
+	"topview-ttk/internal/pkg/common/interceptor/rpc"
 
 	"topview-ttk/internal/app/ttk-user/rpc/internal/config"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/svc"
@@ -33,6 +34,8 @@ func main() {
 			reflection.Register(grpcServer)
 		}
 	})
+	// 添加rpc侧日志拦截器
+	s.AddUnaryInterceptors(rpc.LoggerInterceptor)
 	defer s.Stop()
 
 	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)

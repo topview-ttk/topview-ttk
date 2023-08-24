@@ -4,6 +4,7 @@ package handler
 import (
 	"net/http"
 
+	sso "topview-ttk/internal/app/ttk-api/internal/handler/sso"
 	user "topview-ttk/internal/app/ttk-api/internal/handler/user"
 	"topview-ttk/internal/app/ttk-api/internal/svc"
 
@@ -16,52 +17,73 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodPost,
 				Path:    "/sso/sendPhoneVerificationCode",
-				Handler: user.SendPhoneVerificationCodeHandler(serverCtx),
+				Handler: sso.SendPhoneVerificationCodeHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/sso/sendEmailVerificationCode",
-				Handler: user.SendEmailVerificationCodeHandler(serverCtx),
+				Handler: sso.SendEmailVerificationCodeHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/sso/phoneVerifyCodeLogin",
-				Handler: user.PhoneVerifyCodeLoginHandler(serverCtx),
+				Handler: sso.PhoneVerifyCodeLoginHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/sso/emailVerifyCodeLogin",
-				Handler: user.EmailVerifyCodeLoginHandler(serverCtx),
+				Handler: sso.EmailVerifyCodeLoginHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/sso/phonePassLogin",
-				Handler: user.PhonePassLoginHandler(serverCtx),
+				Handler: sso.PhonePassLoginHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/sso/emailPassLogin",
-				Handler: user.EmailPassLoginHandler(serverCtx),
+				Handler: sso.EmailPassLoginHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/sso/TTKIDPassLogin",
-				Handler: user.TtkidPassLoginHandler(serverCtx),
+				Handler: sso.TtkidPassLoginHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/sso/GithubLogin",
-				Handler: user.GithubLoginHandler(serverCtx),
+				Handler: sso.GithubLoginHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/sso/PhoneRegister",
-				Handler: user.PhoneRegisterHandler(serverCtx),
+				Handler: sso.PhoneRegisterHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
 				Path:    "/sso/EmailRegister",
-				Handler: user.EmailRegisterHandler(serverCtx),
+				Handler: sso.EmailRegisterHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/sso/RefreshToken",
+				Handler: sso.RefreshTokenHandler(serverCtx),
+			},
+		},
+		rest.WithPrefix("/v1"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/user/info",
+				Handler: user.GetUserInfoByUidHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodGet,
+				Path:    "/user/infoByTTKId",
+				Handler: user.GetUserInfoByTTKIdHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/v1"),

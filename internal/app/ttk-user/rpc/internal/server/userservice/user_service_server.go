@@ -22,7 +22,12 @@ func NewUserServiceServer(svcCtx *svc.ServiceContext) *UserServiceServer {
 	}
 }
 
-func (s *UserServiceServer) Ping(ctx context.Context, in *user.Request) (*user.Response, error) {
-	l := userservicelogic.NewPingLogic(ctx, s.svcCtx)
-	return l.Ping(in)
+func (s *UserServiceServer) GetUserInfoByUid(ctx context.Context, in *user.GetUserInfoByUidRequest) (*user.GetUserInfoResponse, error) {
+	l := userservicelogic.NewGetUserInfoByUidLogic(ctx, s.svcCtx)
+	return l.GetUserInfoByUid(in)
+}
+
+func (s *UserServiceServer) GetUserInfoByTTKId(ctx context.Context, in *user.GetUserInfoByTTKIdRequest) (*user.GetUserInfoResponse, error) {
+	l := userservicelogic.NewGetUserInfoByTTKIdLogic(ctx, s.svcCtx)
+	return l.GetUserInfoByTTKId(in)
 }

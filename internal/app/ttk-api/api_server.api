@@ -68,9 +68,11 @@ type (
 
 	// 登录响应
 	LoginResponse {
-		StatusCode int32    `json:"status_code"`
-		Message    string   `json:"message"`
-		UserInfo   UserInfo `json:"user_info"`
+		StatusCode   int32    `json:"status_code"`
+		Message      string   `json:"message"`
+		UserInfo     UserInfo `json:"user_info"`
+		Token        string   `json:"token"`
+		TokenExpires string   `json:"token_expires"`
 	}
 )
 // 登录=====
@@ -99,13 +101,25 @@ type (
 )
 // 注册=====
 
+type (
+	RefreshTokenRequest {
+		Token string `json:"token"`
+	}
+
+	RefreshTokenResponse {
+		StatusCode int32  `json:"status_code"`
+		Message    string `json:"message"`
+		RefToken   string `json:"ref_token"`
+	}
+)
+
 type UserInfo {
 	TTkId string `json:"ttk_id"`
 }
 
 @server(
 	prefix: /v1
-	group: user
+	group: sso
 )
 service api_server {
 	//////////////////////////////// Send
@@ -151,4 +165,31 @@ service api_server {
 	@handler EmailRegister
 	post /sso/EmailRegister (EmailRegisterRequest) returns (RegisterResponse)
 
+	@handler RefreshToken
+	post /sso/RefreshToken (RefreshTokenRequest) returns (RefreshTokenResponse)
+}
+
+type (
+	GetUserInfoByUidRequest {
+		Uid int64 `form:"uid"`
+	}
+
+	GetUserInfoByTTKIdRequest {
+		TTKId int64 `form:"ttk_id"`
+	}
+	GetUserInfoResponse {
+		UserInfo UserInfo `json:"user_info"`
+	}
+)
+
+@server(
+	prefix: /v1
+	group: user
+)
+service api_server {
+	@handler GetUserInfoByUid
+	get /user/info (GetUserInfoByUidRequest) returns (GetUserInfoResponse)
+
+	@handler GetUserInfoByTTKId
+	get /user/infoByTTKId (GetUserInfoByTTKIdRequest) returns (GetUserInfoResponse)
 }

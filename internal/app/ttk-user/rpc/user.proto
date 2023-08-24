@@ -10,22 +10,27 @@ enum StatusCode {
 }
 
 message UserInfo{
-  int64 id  = 1;
+  int64 id = 1;
   string user_name = 2;
   string nick_name = 3;
 }
 
-message Request {
-  string ping = 1;
+message GetUserInfoByUidRequest {
+  int64 uid = 1;
 }
 
-message Response {
-  string pong = 1;
+message GetUserInfoByTTKIdRequest {
+  string ttk_id = 1;
+}
+
+message GetUserInfoResponse {
+  UserInfo user_info = 1;
 }
 
 
 service UserService {
-  rpc Ping(Request) returns(Response);
+  rpc GetUserInfoByUid(GetUserInfoByUidRequest)returns (GetUserInfoResponse);
+  rpc GetUserInfoByTTKId(GetUserInfoByTTKIdRequest) returns (GetUserInfoResponse);
 }
 
 // 发送验证码=====
@@ -121,6 +126,7 @@ message LoginResponse {
   StatusCode statusCode = 1;
   string message = 2;
   UserInfo userInfo = 3;
+  string token = 4;
 }
 // 登录==========
 
@@ -147,6 +153,20 @@ message RegisterResponse {
 }
 // 注册==========
 
+message RefreshTokenRequest{
+  string token = 1;
+  // 设备信息
+  string device_info = 2;
+  // 客户端版本
+  string client_info = 3;
+}
+
+message RefreshTokenResponse{
+  StatusCode statusCode = 1;
+  string message = 2;
+  string refToken = 3;
+}
+
 
 service SsoService{
   // 发送验证码
@@ -164,5 +184,7 @@ service SsoService{
   // 注册
   rpc EmailRegister(EmailRegisterRequest) returns (RegisterResponse);
   rpc PhoneRegister(PhoneRegisterRequest) returns (RegisterResponse);
+
+  rpc RefreshToken(RefreshTokenRequest) returns (RefreshTokenResponse);
 }
 

@@ -68,9 +68,18 @@ func (l *PhonePassLoginLogic) PhonePassLogin(in *user.PhonePassLoginRequest) (*u
 		}, nil
 	}
 	userInfo, err := l.svcCtx.TtkUserInfoModel.FindOne(l.ctx, userCredentials.Id)
+	token, err := login.GenerateVfToken(in.DeviceInfo, in.ClientInfo, userInfo.Id)
+	if err != nil {
+		logx.Error(err)
+		return &user.LoginResponse{
+			StatusCode: user.StatusCode_INVALID_ARGUMENT,
+			Message:    "系统繁忙，请重试！",
+		}, nil
+	}
 	return &user.LoginResponse{
 		StatusCode: user.StatusCode_OK,
 		Message:    "登录成功，正在加载",
+		Token:      token,
 		UserInfo: &user.UserInfo{
 			Id:       userInfo.Id,
 			UserName: userInfo.TtkId,

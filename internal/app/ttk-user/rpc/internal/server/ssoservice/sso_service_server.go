@@ -74,3 +74,8 @@ func (s *SsoServiceServer) PhoneRegister(ctx context.Context, in *user.PhoneRegi
 	l := ssoservicelogic.NewPhoneRegisterLogic(ctx, s.svcCtx)
 	return l.PhoneRegister(in)
 }
+
+func (s *SsoServiceServer) RefreshToken(ctx context.Context, in *user.RefreshTokenRequest) (*user.RefreshTokenResponse, error) {
+	l := ssoservicelogic.NewRefreshTokenLogic(ctx, s.svcCtx)
+	return l.RefreshToken(in)
+}
