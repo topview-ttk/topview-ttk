@@ -1,4 +1,4 @@
-package user
+package sso
 
 import (
 	"context"
@@ -10,23 +10,23 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type SendEmailVerificationCodeLogic struct {
+type SendPhoneVerificationCodeLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewSendEmailVerificationCodeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SendEmailVerificationCodeLogic {
-	return &SendEmailVerificationCodeLogic{
+func NewSendPhoneVerificationCodeLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SendPhoneVerificationCodeLogic {
+	return &SendPhoneVerificationCodeLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *SendEmailVerificationCodeLogic) SendEmailVerificationCode(req *types.SendEmailVerificationCodeRequest) (resp *types.SendVerificationCodeResponse, err error) {
-	rpcResp, err := l.svcCtx.SsoClient.SendEmailVerificationCode(l.ctx, &user.SendEmailVerificationCodeRequest{
-		Email:      req.Email,
+func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(req *types.SendPhoneVerificationCodeRequest) (resp *types.SendVerificationCodeResponse, err error) {
+	rpcResp, err := l.svcCtx.SsoClient.SendPhoneVerificationCode(l.ctx, &user.SendPhoneVerificationCodeRequest{
+		Phone:      req.Phone,
 		DeviceInfo: req.DeviceInfo,
 		ClientInfo: req.ClientInfo,
 	})

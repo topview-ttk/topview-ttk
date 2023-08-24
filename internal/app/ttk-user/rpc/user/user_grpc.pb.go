@@ -27,8 +27,8 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
-	GetUserInfoByUid(ctx context.Context, in *GetUserInfoByUidRequest, opts ...grpc.CallOption) (*GetUserInfResponse, error)
-	GetUserInfoByUserName(ctx context.Context, in *GetUserInfoByUserNameRequest, opts ...grpc.CallOption) (*GetUserInfResponse, error)
+	GetUserInfoByUid(ctx context.Context, in *GetUserInfoByUidRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
+	GetUserInfoByUserName(ctx context.Context, in *GetUserInfoByUserNameRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
 }
 
 type userServiceClient struct {
@@ -39,8 +39,8 @@ func NewUserServiceClient(cc grpc.ClientConnInterface) UserServiceClient {
 	return &userServiceClient{cc}
 }
 
-func (c *userServiceClient) GetUserInfoByUid(ctx context.Context, in *GetUserInfoByUidRequest, opts ...grpc.CallOption) (*GetUserInfResponse, error) {
-	out := new(GetUserInfResponse)
+func (c *userServiceClient) GetUserInfoByUid(ctx context.Context, in *GetUserInfoByUidRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
+	out := new(GetUserInfoResponse)
 	err := c.cc.Invoke(ctx, UserService_GetUserInfoByUid_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -48,8 +48,8 @@ func (c *userServiceClient) GetUserInfoByUid(ctx context.Context, in *GetUserInf
 	return out, nil
 }
 
-func (c *userServiceClient) GetUserInfoByUserName(ctx context.Context, in *GetUserInfoByUserNameRequest, opts ...grpc.CallOption) (*GetUserInfResponse, error) {
-	out := new(GetUserInfResponse)
+func (c *userServiceClient) GetUserInfoByUserName(ctx context.Context, in *GetUserInfoByUserNameRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
+	out := new(GetUserInfoResponse)
 	err := c.cc.Invoke(ctx, UserService_GetUserInfoByUserName_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -61,8 +61,8 @@ func (c *userServiceClient) GetUserInfoByUserName(ctx context.Context, in *GetUs
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility
 type UserServiceServer interface {
-	GetUserInfoByUid(context.Context, *GetUserInfoByUidRequest) (*GetUserInfResponse, error)
-	GetUserInfoByUserName(context.Context, *GetUserInfoByUserNameRequest) (*GetUserInfResponse, error)
+	GetUserInfoByUid(context.Context, *GetUserInfoByUidRequest) (*GetUserInfoResponse, error)
+	GetUserInfoByUserName(context.Context, *GetUserInfoByUserNameRequest) (*GetUserInfoResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -70,10 +70,10 @@ type UserServiceServer interface {
 type UnimplementedUserServiceServer struct {
 }
 
-func (UnimplementedUserServiceServer) GetUserInfoByUid(context.Context, *GetUserInfoByUidRequest) (*GetUserInfResponse, error) {
+func (UnimplementedUserServiceServer) GetUserInfoByUid(context.Context, *GetUserInfoByUidRequest) (*GetUserInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfoByUid not implemented")
 }
-func (UnimplementedUserServiceServer) GetUserInfoByUserName(context.Context, *GetUserInfoByUserNameRequest) (*GetUserInfResponse, error) {
+func (UnimplementedUserServiceServer) GetUserInfoByUserName(context.Context, *GetUserInfoByUserNameRequest) (*GetUserInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfoByUserName not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}

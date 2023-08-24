@@ -16,21 +16,21 @@ message UserInfo{
 }
 
 message GetUserInfoByUidRequest {
-
+  int64 uid = 1;
 }
 
 message GetUserInfoByUserNameRequest {
-
+  string user_name = 1;
 }
 
-message GetUserInfResponse {
-
+message GetUserInfoResponse {
+  UserInfo user_info = 1;
 }
 
 
 service UserService {
-  rpc GetUserInfoByUid(GetUserInfoByUidRequest)returns (GetUserInfResponse);
-  rpc GetUserInfoByUserName(GetUserInfoByUserNameRequest) returns (GetUserInfResponse);
+  rpc GetUserInfoByUid(GetUserInfoByUidRequest)returns (GetUserInfoResponse);
+  rpc GetUserInfoByUserName(GetUserInfoByUserNameRequest) returns (GetUserInfoResponse);
 }
 
 // 发送验证码=====

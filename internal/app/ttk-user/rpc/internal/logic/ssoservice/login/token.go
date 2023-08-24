@@ -7,9 +7,7 @@ import (
 	"topview-ttk/internal/pkg/common"
 )
 
-const TokenExpires = 15 * 243 * time.Hour
-
-const TestExpires = 30 * time.Second
+const TokenExpires = 15 * 24 * time.Hour
 
 func GenerateVfToken(deviceInfo, clientInfo string, uid int64) (string, error) {
 	//初始化结构体

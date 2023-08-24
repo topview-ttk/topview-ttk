@@ -1,4 +1,4 @@
-package user
+package sso
 
 import (
 	"context"
@@ -10,25 +10,26 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type GithubLoginLogic struct {
+type PhonePassLoginLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewGithubLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GithubLoginLogic {
-	return &GithubLoginLogic{
+func NewPhonePassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PhonePassLoginLogic {
+	return &PhonePassLoginLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *GithubLoginLogic) GithubLogin(req *types.GithubLoginRequest) (resp *types.LoginResponse, err error) {
-	rpcResp, err := l.svcCtx.SsoClient.GithubLogin(l.ctx, &user.GitHubLoginRequest{
-		Token		:    req.Token,
-		DeviceInfo	: 	 req.DeviceInfo,
-		ClientInfo	: 	 req.ClientInfo,
+func (l *PhonePassLoginLogic) PhonePassLogin(req *types.PhonePassLoginRequest) (resp *types.LoginResponse, err error) {
+	rpcResp, err := l.svcCtx.SsoClient.PhonePassLogin(l.ctx, &user.PhonePassLoginRequest{
+		Phone:      req.Phone,
+		Pass:       req.Password,
+		DeviceInfo: req.DeviceInfo,
+		ClientInfo: req.ClientInfo,
 	})
 
 	if err != nil {
@@ -39,7 +40,7 @@ func (l *GithubLoginLogic) GithubLogin(req *types.GithubLoginRequest) (resp *typ
 	return &types.LoginResponse{
 		StatusCode: int32(rpcResp.GetStatusCode().Number()),
 		Message:    rpcResp.Message,
+		Token:      rpcResp.Token,
 		// todo User_info
 	}, err
-
 }

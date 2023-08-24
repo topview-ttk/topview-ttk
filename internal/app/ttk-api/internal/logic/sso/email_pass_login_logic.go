@@ -1,7 +1,8 @@
-package user
+package sso
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
 
 	"topview-ttk/internal/app/ttk-api/internal/svc"
@@ -34,13 +35,12 @@ func (l *EmailPassLoginLogic) EmailPassLogin(req *types.EmailLoginRequest) (resp
 	})
 
 	if err != nil {
-		logx.Error(err)
-		return &types.LoginResponse{}, err
+		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
 
 	return &types.LoginResponse{
 		StatusCode: int32(rpcResp.GetStatusCode().Number()),
 		Message:    rpcResp.Message,
-		// todo User_info
+		Token:      resp.Token,
 	}, err
 }

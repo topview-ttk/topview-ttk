@@ -16,14 +16,17 @@ type (
 	EmailPassLoginRequest            = user.EmailPassLoginRequest
 	EmailRegisterRequest             = user.EmailRegisterRequest
 	EmailVerifyCodeLoginRequest      = user.EmailVerifyCodeLoginRequest
+	GetUserInfoByUidRequest          = user.GetUserInfoByUidRequest
+	GetUserInfoByUserNameRequest     = user.GetUserInfoByUserNameRequest
+	GetUserInfoResponse              = user.GetUserInfoResponse
 	GitHubLoginRequest               = user.GitHubLoginRequest
 	LoginResponse                    = user.LoginResponse
 	PhonePassLoginRequest            = user.PhonePassLoginRequest
 	PhoneRegisterRequest             = user.PhoneRegisterRequest
 	PhoneVerifyCodeLoginRequest      = user.PhoneVerifyCodeLoginRequest
+	RefreshTokenRequest              = user.RefreshTokenRequest
+	RefreshTokenResponse             = user.RefreshTokenResponse
 	RegisterResponse                 = user.RegisterResponse
-	Request                          = user.Request
-	Response                         = user.Response
 	SendEmailVerificationCodeRequest = user.SendEmailVerificationCodeRequest
 	SendPhoneVerificationCodeRequest = user.SendPhoneVerificationCodeRequest
 	SendVerificationCodeResponse     = user.SendVerificationCodeResponse
@@ -31,7 +34,8 @@ type (
 	UserInfo                         = user.UserInfo
 
 	UserService interface {
-		Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error)
+		GetUserInfoByUid(ctx context.Context, in *GetUserInfoByUidRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
+		GetUserInfoByUserName(ctx context.Context, in *GetUserInfoByUserNameRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
 	}
 
 	defaultUserService struct {
@@ -45,7 +49,12 @@ func NewUserService(cli zrpc.Client) UserService {
 	}
 }
 
-func (m *defaultUserService) Ping(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Response, error) {
+func (m *defaultUserService) GetUserInfoByUid(ctx context.Context, in *GetUserInfoByUidRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
 	client := user.NewUserServiceClient(m.cli.Conn())
-	return client.Ping(ctx, in, opts...)
+	return client.GetUserInfoByUid(ctx, in, opts...)
+}
+
+func (m *defaultUserService) GetUserInfoByUserName(ctx context.Context, in *GetUserInfoByUserNameRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
+	client := user.NewUserServiceClient(m.cli.Conn())
+	return client.GetUserInfoByUserName(ctx, in, opts...)
 }

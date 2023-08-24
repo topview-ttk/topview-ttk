@@ -60,9 +60,11 @@ type GithubLoginRequest struct {
 }
 
 type LoginResponse struct {
-	StatusCode int32    `json:"status_code"`
-	Message    string   `json:"message"`
-	UserInfo   UserInfo `json:"user_info"`
+	StatusCode   int32    `json:"status_code"`
+	Message      string   `json:"message"`
+	UserInfo     UserInfo `json:"user_info"`
+	Token        string   `json:"token"`
+	TokenExpires string   `json:"token_expires"`
 }
 
 type PhoneRegisterRequest struct {
@@ -82,6 +84,32 @@ type RegisterResponse struct {
 	Message    string `json:"message"`
 }
 
+type RefreshTokenRequest struct {
+	Token string `json:"token"`
+}
+
+type RefreshTokenResponse struct {
+	StatusCode int32  `json:"status_code"`
+	Message    string `json:"message"`
+	RefToken   string `json:"ref_token"`
+}
+
 type UserInfo struct {
 	TTkId string `json:"ttk_id"`
+}
+
+type GetUserInfoByUidRequest struct {
+	Uid int64 `form:"uid"`
+}
+
+type GetUserInfoByUidResponse struct {
+	UserInfo UserInfo `json:"user_info"`
+}
+
+type GetUserInfoByTTKIdRequest struct {
+	TTKId int64 `form:"ttk_id"`
+}
+
+type GetUserInfoByTTKIdResponse struct {
+	UserInfo UserInfo `json:"user_info"`
 }

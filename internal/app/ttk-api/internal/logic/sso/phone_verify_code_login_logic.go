@@ -1,4 +1,4 @@
-package user
+package sso
 
 import (
 	"context"
@@ -24,7 +24,7 @@ func NewPhoneVerifyCodeLoginLogic(ctx context.Context, svcCtx *svc.ServiceContex
 	}
 }
 
-func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(req *types.PhoneVerifyCodeLoginRequest) (resp *types.SendVerificationCodeResponse, err error) {
+func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(req *types.PhoneVerifyCodeLoginRequest) (resp *types.LoginResponse, err error) {
 	rpcResp, err := l.svcCtx.SsoClient.PhoneVerifyCodeLogin(l.ctx, &user.PhoneVerifyCodeLoginRequest{
 		Phone:            req.Phone,
 		VerificationCode: req.VerificationCode,
@@ -34,12 +34,13 @@ func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(req *types.PhoneVerifyC
 
 	if err != nil {
 		logx.Error(err)
-		return &types.SendVerificationCodeResponse{}, err
+		return &types.LoginResponse{}, err
 	}
 
-	return &types.SendVerificationCodeResponse{
+	return &types.LoginResponse{
 		StatusCode: int32(rpcResp.GetStatusCode().Number()),
 		Message:    rpcResp.Message,
+		Token:      rpcResp.Token,
 		// todo User_info
 	}, err
 }

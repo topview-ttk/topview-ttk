@@ -1,4 +1,4 @@
-package user
+package sso
 
 import (
 	"context"
@@ -10,23 +10,23 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type PhonePassLoginLogic struct {
+type TtkidPassLoginLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewPhonePassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *PhonePassLoginLogic {
-	return &PhonePassLoginLogic{
+func NewTtkidPassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TtkidPassLoginLogic {
+	return &TtkidPassLoginLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *PhonePassLoginLogic) PhonePassLogin(req *types.PhonePassLoginRequest) (resp *types.LoginResponse, err error) {
-	rpcResp, err := l.svcCtx.SsoClient.PhonePassLogin(l.ctx, &user.PhonePassLoginRequest{
-		Phone:      req.Phone,
+func (l *TtkidPassLoginLogic) TtkidPassLogin(req *types.TTkIDLoginRequest) (resp *types.LoginResponse, err error) {
+	rpcResp, err := l.svcCtx.SsoClient.TtkidPassLogin(l.ctx, &user.TTKPassLoginRequest{
+		TtkId:      req.TTkId,
 		Pass:       req.Password,
 		DeviceInfo: req.DeviceInfo,
 		ClientInfo: req.ClientInfo,
@@ -40,6 +40,7 @@ func (l *PhonePassLoginLogic) PhonePassLogin(req *types.PhonePassLoginRequest) (
 	return &types.LoginResponse{
 		StatusCode: int32(rpcResp.GetStatusCode().Number()),
 		Message:    rpcResp.Message,
-		// todo User_info
+		UserInfo:   types.UserInfo{TTkId: rpcResp.UserInfo.GetUserName()},
+		Token:      rpcResp.Token,
 	}, err
 }

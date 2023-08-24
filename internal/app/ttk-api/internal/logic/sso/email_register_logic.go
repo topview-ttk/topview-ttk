@@ -1,7 +1,8 @@
-package user
+package sso
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
 
 	"topview-ttk/internal/app/ttk-api/internal/svc"
@@ -32,8 +33,7 @@ func (l *EmailRegisterLogic) EmailRegister(req *types.EmailRegisterRequest) (res
 	})
 
 	if err != nil {
-		logx.Error(err)
-		return &types.RegisterResponse{}, err
+		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
 
 	return &types.RegisterResponse{
