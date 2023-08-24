@@ -19,8 +19,8 @@ message GetUserInfoByUidRequest {
   int64 uid = 1;
 }
 
-message GetUserInfoByUserNameRequest {
-  string user_name = 1;
+message GetUserInfoByTTKIdRequest {
+  string ttk_id = 1;
 }
 
 message GetUserInfoResponse {
@@ -30,7 +30,7 @@ message GetUserInfoResponse {
 
 service UserService {
   rpc GetUserInfoByUid(GetUserInfoByUidRequest)returns (GetUserInfoResponse);
-  rpc GetUserInfoByUserName(GetUserInfoByUserNameRequest) returns (GetUserInfoResponse);
+  rpc GetUserInfoByTTKId(GetUserInfoByTTKIdRequest) returns (GetUserInfoResponse);
 }
 
 // 发送验证码=====

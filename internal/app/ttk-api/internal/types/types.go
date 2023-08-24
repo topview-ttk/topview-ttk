@@ -102,14 +102,10 @@ type GetUserInfoByUidRequest struct {
 	Uid int64 `form:"uid"`
 }
 
-type GetUserInfoByUidResponse struct {
-	UserInfo UserInfo `json:"user_info"`
-}
-
 type GetUserInfoByTTKIdRequest struct {
 	TTKId int64 `form:"ttk_id"`
 }
 
-type GetUserInfoByTTKIdResponse struct {
+type GetUserInfoResponse struct {
 	UserInfo UserInfo `json:"user_info"`
 }

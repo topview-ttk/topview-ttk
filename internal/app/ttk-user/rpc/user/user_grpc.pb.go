@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UserService_GetUserInfoByUid_FullMethodName      = "/user.UserService/GetUserInfoByUid"
-	UserService_GetUserInfoByUserName_FullMethodName = "/user.UserService/GetUserInfoByUserName"
+	UserService_GetUserInfoByUid_FullMethodName   = "/user.UserService/GetUserInfoByUid"
+	UserService_GetUserInfoByTTKId_FullMethodName = "/user.UserService/GetUserInfoByTTKId"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -28,7 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserServiceClient interface {
 	GetUserInfoByUid(ctx context.Context, in *GetUserInfoByUidRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
-	GetUserInfoByUserName(ctx context.Context, in *GetUserInfoByUserNameRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
+	GetUserInfoByTTKId(ctx context.Context, in *GetUserInfoByTTKIdRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
 }
 
 type userServiceClient struct {
@@ -48,9 +48,9 @@ func (c *userServiceClient) GetUserInfoByUid(ctx context.Context, in *GetUserInf
 	return out, nil
 }
 
-func (c *userServiceClient) GetUserInfoByUserName(ctx context.Context, in *GetUserInfoByUserNameRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
+func (c *userServiceClient) GetUserInfoByTTKId(ctx context.Context, in *GetUserInfoByTTKIdRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
 	out := new(GetUserInfoResponse)
-	err := c.cc.Invoke(ctx, UserService_GetUserInfoByUserName_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, UserService_GetUserInfoByTTKId_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +62,7 @@ func (c *userServiceClient) GetUserInfoByUserName(ctx context.Context, in *GetUs
 // for forward compatibility
 type UserServiceServer interface {
 	GetUserInfoByUid(context.Context, *GetUserInfoByUidRequest) (*GetUserInfoResponse, error)
-	GetUserInfoByUserName(context.Context, *GetUserInfoByUserNameRequest) (*GetUserInfoResponse, error)
+	GetUserInfoByTTKId(context.Context, *GetUserInfoByTTKIdRequest) (*GetUserInfoResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -73,8 +73,8 @@ type UnimplementedUserServiceServer struct {
 func (UnimplementedUserServiceServer) GetUserInfoByUid(context.Context, *GetUserInfoByUidRequest) (*GetUserInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfoByUid not implemented")
 }
-func (UnimplementedUserServiceServer) GetUserInfoByUserName(context.Context, *GetUserInfoByUserNameRequest) (*GetUserInfoResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfoByUserName not implemented")
+func (UnimplementedUserServiceServer) GetUserInfoByTTKId(context.Context, *GetUserInfoByTTKIdRequest) (*GetUserInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfoByTTKId not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 
@@ -107,20 +107,20 @@ func _UserService_GetUserInfoByUid_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
-func _UserService_GetUserInfoByUserName_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUserInfoByUserNameRequest)
+func _UserService_GetUserInfoByTTKId_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserInfoByTTKIdRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(UserServiceServer).GetUserInfoByUserName(ctx, in)
+		return srv.(UserServiceServer).GetUserInfoByTTKId(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: UserService_GetUserInfoByUserName_FullMethodName,
+		FullMethod: UserService_GetUserInfoByTTKId_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(UserServiceServer).GetUserInfoByUserName(ctx, req.(*GetUserInfoByUserNameRequest))
+		return srv.(UserServiceServer).GetUserInfoByTTKId(ctx, req.(*GetUserInfoByTTKIdRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -137,8 +137,8 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserService_GetUserInfoByUid_Handler,
 		},
 		{
-			MethodName: "GetUserInfoByUserName",
-			Handler:    _UserService_GetUserInfoByUserName_Handler,
+			MethodName: "GetUserInfoByTTKId",
+			Handler:    _UserService_GetUserInfoByTTKId_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

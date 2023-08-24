@@ -173,14 +173,11 @@ type (
 	GetUserInfoByUidRequest {
 		Uid int64 `form:"uid"`
 	}
-	GetUserInfoByUidResponse {
-		UserInfo UserInfo `json:"user_info"`
-	}
 
 	GetUserInfoByTTKIdRequest {
 		TTKId int64 `form:"ttk_id"`
 	}
-	GetUserInfoByTTKIdResponse {
+	GetUserInfoResponse {
 		UserInfo UserInfo `json:"user_info"`
 	}
 )
@@ -191,8 +188,8 @@ type (
 )
 service api_server {
 	@handler GetUserInfoByUid
-	get /user/info (GetUserInfoByUidRequest) returns (GetUserInfoByUidResponse)
+	get /user/info (GetUserInfoByUidRequest) returns (GetUserInfoResponse)
 
 	@handler GetUserInfoByTTKId
-	get /user/infoByTTKId (GetUserInfoByTTKIdRequest) returns (GetUserInfoByTTKIdResponse)
+	get /user/infoByTTKId (GetUserInfoByTTKIdRequest) returns (GetUserInfoResponse)
 }

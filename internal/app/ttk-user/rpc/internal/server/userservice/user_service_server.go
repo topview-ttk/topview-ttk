@@ -27,7 +27,7 @@ func (s *UserServiceServer) GetUserInfoByUid(ctx context.Context, in *user.GetUs
 	return l.GetUserInfoByUid(in)
 }
 
-func (s *UserServiceServer) GetUserInfoByUserName(ctx context.Context, in *user.GetUserInfoByUserNameRequest) (*user.GetUserInfoResponse, error) {
-	l := userservicelogic.NewGetUserInfoByUserNameLogic(ctx, s.svcCtx)
-	return l.GetUserInfoByUserName(in)
+func (s *UserServiceServer) GetUserInfoByTTKId(ctx context.Context, in *user.GetUserInfoByTTKIdRequest) (*user.GetUserInfoResponse, error) {
+	l := userservicelogic.NewGetUserInfoByTTKIdLogic(ctx, s.svcCtx)
+	return l.GetUserInfoByTTKId(in)
 }

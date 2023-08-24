@@ -16,8 +16,8 @@ type (
 	EmailPassLoginRequest            = user.EmailPassLoginRequest
 	EmailRegisterRequest             = user.EmailRegisterRequest
 	EmailVerifyCodeLoginRequest      = user.EmailVerifyCodeLoginRequest
+	GetUserInfoByTTKIdRequest        = user.GetUserInfoByTTKIdRequest
 	GetUserInfoByUidRequest          = user.GetUserInfoByUidRequest
-	GetUserInfoByUserNameRequest     = user.GetUserInfoByUserNameRequest
 	GetUserInfoResponse              = user.GetUserInfoResponse
 	GitHubLoginRequest               = user.GitHubLoginRequest
 	LoginResponse                    = user.LoginResponse
@@ -35,7 +35,7 @@ type (
 
 	UserService interface {
 		GetUserInfoByUid(ctx context.Context, in *GetUserInfoByUidRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
-		GetUserInfoByUserName(ctx context.Context, in *GetUserInfoByUserNameRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
+		GetUserInfoByTTKId(ctx context.Context, in *GetUserInfoByTTKIdRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
 	}
 
 	defaultUserService struct {
@@ -54,7 +54,7 @@ func (m *defaultUserService) GetUserInfoByUid(ctx context.Context, in *GetUserIn
 	return client.GetUserInfoByUid(ctx, in, opts...)
 }
 
-func (m *defaultUserService) GetUserInfoByUserName(ctx context.Context, in *GetUserInfoByUserNameRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
+func (m *defaultUserService) GetUserInfoByTTKId(ctx context.Context, in *GetUserInfoByTTKIdRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
 	client := user.NewUserServiceClient(m.cli.Conn())
-	return client.GetUserInfoByUserName(ctx, in, opts...)
+	return client.GetUserInfoByTTKId(ctx, in, opts...)
 }

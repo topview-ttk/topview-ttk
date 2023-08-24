@@ -16,8 +16,8 @@ type (
 	EmailPassLoginRequest            = user.EmailPassLoginRequest
 	EmailRegisterRequest             = user.EmailRegisterRequest
 	EmailVerifyCodeLoginRequest      = user.EmailVerifyCodeLoginRequest
+	GetUserInfoByTTKIdRequest        = user.GetUserInfoByTTKIdRequest
 	GetUserInfoByUidRequest          = user.GetUserInfoByUidRequest
-	GetUserInfoByUserNameRequest     = user.GetUserInfoByUserNameRequest
 	GetUserInfoResponse              = user.GetUserInfoResponse
 	GitHubLoginRequest               = user.GitHubLoginRequest
 	LoginResponse                    = user.LoginResponse
