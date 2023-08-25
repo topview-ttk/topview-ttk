@@ -2,10 +2,10 @@ package sso
 
 import (
 	"context"
-	"topview-ttk/internal/app/ttk-user/rpc/user"
-
+	"github.com/pkg/errors"
 	"topview-ttk/internal/app/ttk-api/internal/svc"
 	"topview-ttk/internal/app/ttk-api/internal/types"
+	"topview-ttk/internal/app/ttk-user/rpc/user"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -30,13 +30,10 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenRequest) (resp *
 	})
 
 	if err != nil {
-		logx.Error(err)
-		return &types.RefreshTokenResponse{}, err
+		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
 
 	return &types.RefreshTokenResponse{
-		StatusCode: int32(rpcResp.GetStatusCode().Number()),
-		Message:    rpcResp.Message,
-		RefToken:   rpcResp.RefToken,
+		RefToken: rpcResp.RefToken,
 	}, err
 }

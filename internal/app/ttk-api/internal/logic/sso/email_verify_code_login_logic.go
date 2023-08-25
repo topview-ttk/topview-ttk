@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/pkg/errors"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
+	"topview-ttk/internal/pkg/common/token"
 
 	"topview-ttk/internal/app/ttk-api/internal/svc"
 	"topview-ttk/internal/app/ttk-api/internal/types"
@@ -32,16 +33,17 @@ func (l *EmailVerifyCodeLoginLogic) EmailVerifyCodeLogin(req *types.EmailVerifyC
 		DeviceInfo:       req.DeviceInfo,
 		ClientInfo:       req.ClientInfo,
 	})
+	_ = rpcResp.UserInfo.UserName
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-
+	t, err := token.GenerateVfToken(req.DeviceInfo, req.ClientInfo, rpcResp.UserInfo.Id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "req: %+v", req)
+	}
 	return &types.LoginResponse{
-		StatusCode: int32(rpcResp.GetStatusCode().Number()),
-		Message:    rpcResp.Message,
-		Token:      resp.Token,
-		// todo User_info
+		Token: t,
 	}, err
 
 }

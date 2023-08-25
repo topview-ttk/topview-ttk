@@ -14,8 +14,6 @@ type SendEmailVerificationCodeRequest struct {
 }
 
 type SendVerificationCodeResponse struct {
-	StatusCode int32  `json:"status_code"`
-	Message    string `json:"message"`
 }
 
 type PhoneVerifyCodeLoginRequest struct {
@@ -60,11 +58,8 @@ type GithubLoginRequest struct {
 }
 
 type LoginResponse struct {
-	StatusCode   int32    `json:"status_code"`
-	Message      string   `json:"message"`
-	UserInfo     UserInfo `json:"user_info"`
-	Token        string   `json:"token"`
-	TokenExpires string   `json:"token_expires"`
+	Token        string `json:"token"`
+	TokenExpires string `json:"token_expires"`
 }
 
 type PhoneRegisterRequest struct {
@@ -80,8 +75,6 @@ type EmailRegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	StatusCode int32  `json:"status_code"`
-	Message    string `json:"message"`
 }
 
 type RefreshTokenRequest struct {
@@ -89,9 +82,7 @@ type RefreshTokenRequest struct {
 }
 
 type RefreshTokenResponse struct {
-	StatusCode int32  `json:"status_code"`
-	Message    string `json:"message"`
-	RefToken   string `json:"ref_token"`
+	RefToken string `json:"ref_token"`
 }
 
 type UserInfo struct {

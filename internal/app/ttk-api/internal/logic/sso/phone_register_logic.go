@@ -25,7 +25,7 @@ func NewPhoneRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Pho
 }
 
 func (l *PhoneRegisterLogic) PhoneRegister(req *types.PhoneRegisterRequest) (resp *types.RegisterResponse, err error) {
-	rpcResp, err := l.svcCtx.SsoClient.PhoneRegister(l.ctx, &user.PhoneRegisterRequest{
+	_, err = l.svcCtx.SsoClient.PhoneRegister(l.ctx, &user.PhoneRegisterRequest{
 		Nickname: req.NickName,
 		Phone:    req.Phone,
 		Password: req.Password,
@@ -36,9 +36,5 @@ func (l *PhoneRegisterLogic) PhoneRegister(req *types.PhoneRegisterRequest) (res
 		return &types.RegisterResponse{}, err
 	}
 
-	return &types.RegisterResponse{
-		StatusCode: int32(rpcResp.GetStatusCode().Number()),
-		Message:    rpcResp.Message,
-		// todo User_info
-	}, err
+	return &types.RegisterResponse{}, err
 }

@@ -1,17 +1,32 @@
-package login
+package token
 
 import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/zeromicro/go-zero/core/logx"
 	"time"
-	"topview-ttk/internal/pkg/common"
 )
 
 const TokenExpires = 15 * 24 * time.Hour
+const AccessSecret string = "ttk_access_secret"
+
+type UserClaims struct {
+	Uid                  int64
+	DeviceInfo           string
+	ClientInfo           string
+	jwt.RegisteredClaims // 内嵌标准的声明
+}
+
+func ParseToken(token string) (*UserClaims, error) {
+	claims := &UserClaims{}
+	_, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return []byte(AccessSecret), nil
+	})
+	return claims, err
+}
 
 func GenerateVfToken(deviceInfo, clientInfo string, uid int64) (string, error) {
 	//初始化结构体
-	claims := common.UserClaims{
+	claims := UserClaims{
 		Uid:        uid,
 		DeviceInfo: deviceInfo,
 		ClientInfo: clientInfo,
@@ -27,7 +42,7 @@ func GenerateVfToken(deviceInfo, clientInfo string, uid int64) (string, error) {
 	jwtToken := jwt.New(jwt.SigningMethodHS256)
 	jwtToken.Claims = claims
 
-	token, err := jwtToken.SignedString([]byte(common.AccessSecret))
+	token, err := jwtToken.SignedString([]byte(AccessSecret))
 	if err != nil {
 		logx.Error("jwtToken 生成失败", err)
 		return "", err

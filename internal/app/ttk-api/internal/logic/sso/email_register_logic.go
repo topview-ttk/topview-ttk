@@ -26,7 +26,7 @@ func NewEmailRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ema
 }
 
 func (l *EmailRegisterLogic) EmailRegister(req *types.EmailRegisterRequest) (resp *types.RegisterResponse, err error) {
-	rpcResp, err := l.svcCtx.SsoClient.EmailRegister(l.ctx, &user.EmailRegisterRequest{
+	_, err = l.svcCtx.SsoClient.EmailRegister(l.ctx, &user.EmailRegisterRequest{
 		Email:    req.Email,
 		Nickname: req.NickName,
 		Password: req.Password,
@@ -36,9 +36,5 @@ func (l *EmailRegisterLogic) EmailRegister(req *types.EmailRegisterRequest) (res
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
 
-	return &types.RegisterResponse{
-		StatusCode: int32(rpcResp.GetStatusCode().Number()),
-		Message:    rpcResp.Message,
-		// todo User_info
-	}, err
+	return &types.RegisterResponse{}, err
 }

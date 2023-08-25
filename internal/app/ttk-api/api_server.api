@@ -16,8 +16,6 @@ type (
 	}
 	// 发送验证码响应
 	SendVerificationCodeResponse {
-		StatusCode int32  `json:"status_code"`
-		Message    string `json:"message"`
 	}
 )
 // 发送验证码=====
@@ -68,11 +66,8 @@ type (
 
 	// 登录响应
 	LoginResponse {
-		StatusCode   int32    `json:"status_code"`
-		Message      string   `json:"message"`
-		UserInfo     UserInfo `json:"user_info"`
-		Token        string   `json:"token"`
-		TokenExpires string   `json:"token_expires"`
+		Token        string `json:"token"`
+		TokenExpires string `json:"token_expires"`
 	}
 )
 // 登录=====
@@ -95,8 +90,6 @@ type (
 
 	// 注册响应
 	RegisterResponse {
-		StatusCode int32  `json:"status_code"`
-		Message    string `json:"message"`
 	}
 )
 // 注册=====
@@ -107,9 +100,7 @@ type (
 	}
 
 	RefreshTokenResponse {
-		StatusCode int32  `json:"status_code"`
-		Message    string `json:"message"`
-		RefToken   string `json:"ref_token"`
+		RefToken string `json:"ref_token"`
 	}
 )
 

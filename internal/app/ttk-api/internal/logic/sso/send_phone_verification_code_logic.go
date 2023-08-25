@@ -25,7 +25,7 @@ func NewSendPhoneVerificationCodeLogic(ctx context.Context, svcCtx *svc.ServiceC
 }
 
 func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(req *types.SendPhoneVerificationCodeRequest) (resp *types.SendVerificationCodeResponse, err error) {
-	rpcResp, err := l.svcCtx.SsoClient.SendPhoneVerificationCode(l.ctx, &user.SendPhoneVerificationCodeRequest{
+	_, err = l.svcCtx.SsoClient.SendPhoneVerificationCode(l.ctx, &user.SendPhoneVerificationCodeRequest{
 		Phone:      req.Phone,
 		DeviceInfo: req.DeviceInfo,
 		ClientInfo: req.ClientInfo,
@@ -36,8 +36,5 @@ func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(req *types.Se
 		return &types.SendVerificationCodeResponse{}, err
 	}
 
-	return &types.SendVerificationCodeResponse{
-		StatusCode: int32(rpcResp.GetStatusCode().Number()),
-		Message:    rpcResp.Message,
-	}, err
+	return &types.SendVerificationCodeResponse{}, err
 }
