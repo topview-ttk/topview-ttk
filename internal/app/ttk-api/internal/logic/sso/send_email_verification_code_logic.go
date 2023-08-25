@@ -25,7 +25,7 @@ func NewSendEmailVerificationCodeLogic(ctx context.Context, svcCtx *svc.ServiceC
 }
 
 func (l *SendEmailVerificationCodeLogic) SendEmailVerificationCode(req *types.SendEmailVerificationCodeRequest) (resp *types.SendVerificationCodeResponse, err error) {
-	rpcResp, err := l.svcCtx.SsoClient.SendEmailVerificationCode(l.ctx, &user.SendEmailVerificationCodeRequest{
+	_, err = l.svcCtx.SsoClient.SendEmailVerificationCode(l.ctx, &user.SendEmailVerificationCodeRequest{
 		Email:      req.Email,
 		DeviceInfo: req.DeviceInfo,
 		ClientInfo: req.ClientInfo,
@@ -36,8 +36,5 @@ func (l *SendEmailVerificationCodeLogic) SendEmailVerificationCode(req *types.Se
 		return &types.SendVerificationCodeResponse{}, err
 	}
 
-	return &types.SendVerificationCodeResponse{
-		StatusCode: int32(rpcResp.GetStatusCode().Number()),
-		Message:    rpcResp.Message,
-	}, err
+	return &types.SendVerificationCodeResponse{}, err
 }

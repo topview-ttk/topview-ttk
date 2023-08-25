@@ -3,11 +3,6 @@ syntax = "proto3";
 package user;
 option go_package = "./user";
 
-enum StatusCode {
-  OK = 0;
-  INVALID_ARGUMENT = 1;
-  // 可以继续添加其他状态码
-}
 
 message UserInfo{
   int64 id = 1;
@@ -54,8 +49,6 @@ message SendEmailVerificationCodeRequest {
 
 // 发送验证码响应
 message SendVerificationCodeResponse {
-  StatusCode status_code = 1;
-  string message = 2;
 }
 // 发送验证码=====
 
@@ -123,10 +116,7 @@ message GitHubLoginRequest {
 
 // 登录响应
 message LoginResponse {
-  StatusCode statusCode = 1;
-  string message = 2;
   UserInfo userInfo = 3;
-  string token = 4;
 }
 // 登录==========
 
@@ -148,7 +138,6 @@ message PhoneRegisterRequest {
 
 // 注册响应
 message RegisterResponse {
-  StatusCode statusCode = 1;
   string message = 2;
 }
 // 注册==========
@@ -162,8 +151,6 @@ message RefreshTokenRequest{
 }
 
 message RefreshTokenResponse{
-  StatusCode statusCode = 1;
-  string message = 2;
   string refToken = 3;
 }
 

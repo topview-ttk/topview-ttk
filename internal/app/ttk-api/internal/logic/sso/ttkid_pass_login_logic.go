@@ -2,7 +2,9 @@ package sso
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
+	"topview-ttk/internal/pkg/common/token"
 
 	"topview-ttk/internal/app/ttk-api/internal/svc"
 	"topview-ttk/internal/app/ttk-api/internal/types"
@@ -33,14 +35,13 @@ func (l *TtkidPassLoginLogic) TtkidPassLogin(req *types.TTkIDLoginRequest) (resp
 	})
 
 	if err != nil {
-		logx.Error(err)
-		return &types.LoginResponse{}, err
+		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-
+	t, err := token.GenerateVfToken(req.DeviceInfo, req.ClientInfo, rpcResp.UserInfo.Id)
+	if err != nil {
+		return nil, errors.Wrapf(err, "req: %+v", req)
+	}
 	return &types.LoginResponse{
-		StatusCode: int32(rpcResp.GetStatusCode().Number()),
-		Message:    rpcResp.Message,
-		UserInfo:   types.UserInfo{TTkId: rpcResp.UserInfo.GetUserName()},
-		Token:      rpcResp.Token,
+		Token: t,
 	}, err
 }

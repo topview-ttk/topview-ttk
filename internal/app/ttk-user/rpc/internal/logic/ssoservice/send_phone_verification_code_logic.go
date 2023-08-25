@@ -2,11 +2,12 @@ package ssoservicelogic
 
 import (
 	"context"
+	"github.com/pkg/errors"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/logic/ssoservice/send"
-	"topview-ttk/internal/app/ttk-user/rpc/internal/util"
-
 	"topview-ttk/internal/app/ttk-user/rpc/internal/svc"
+	"topview-ttk/internal/app/ttk-user/rpc/internal/util"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
+	"topview-ttk/internal/pkg/common/ttkerr"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -29,17 +30,11 @@ func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(in *user.Send
 	isValid := util.ValidatePhoneNumber(in.GetPhone())
 
 	if !isValid {
-		return &user.SendVerificationCodeResponse{
-			StatusCode: 1,
-			Message:    "请输入正确的手机号码，当前手机号码不合法",
-		}, nil
+		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.PhoneValidError), "手机格式错误")
 	}
 
 	if !send.CanSendVerificationCode(l.ctx, l.svcCtx.Rdb, in.GetPhone()) {
-		return &user.SendVerificationCodeResponse{
-			StatusCode: 1,
-			Message:    "请求过多或网络繁忙，请重试尝试",
-		}, nil
+		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.SendVerifyCodeFrequentError), "发送验证码频繁，参数：%+v", in)
 	}
 
 	code := send.GenerateVerificationCode()
@@ -48,8 +43,5 @@ func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(in *user.Send
 	if err != nil {
 		logx.Error(err)
 	}
-	return &user.SendVerificationCodeResponse{
-		StatusCode: 0,
-		Message:    "验证码已发送，请注意查收",
-	}, nil
+	return &user.SendVerificationCodeResponse{}, nil
 }
