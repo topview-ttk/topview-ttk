@@ -3,9 +3,11 @@ package handler
 
 import (
 	"net/http"
+	"topview-ttk/internal/pkg/token"
 
 	sso "topview-ttk/internal/app/ttk-api/internal/handler/sso"
 	user "topview-ttk/internal/app/ttk-api/internal/handler/user"
+	userA "topview-ttk/internal/app/ttk-api/internal/handler/userA"
 	"topview-ttk/internal/app/ttk-api/internal/svc"
 
 	"github.com/zeromicro/go-zero/rest"
@@ -86,6 +88,18 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: user.GetUserInfoByTTKIdHandler(serverCtx),
 			},
 		},
+		rest.WithPrefix("/v1"),
+	)
+
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				Method:  http.MethodGet,
+				Path:    "/user/self",
+				Handler: userA.GetUserInfoSelfHandler(serverCtx),
+			},
+		},
+		rest.WithJwt(token.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
 }
