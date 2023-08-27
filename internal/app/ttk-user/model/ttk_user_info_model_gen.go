@@ -19,8 +19,8 @@ import (
 var (
 	ttkUserInfoFieldNames          = builder.RawFieldNames(&TtkUserInfo{})
 	ttkUserInfoRows                = strings.Join(ttkUserInfoFieldNames, ",")
-	ttkUserInfoRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserInfoFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
-	ttkUserInfoRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserInfoFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
+	ttkUserInfoRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserInfoFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
+	ttkUserInfoRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserInfoFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkUserInfoIdPrefix    = "cache:ttkUserInfo:id:"
 	cacheTtkUserInfoTtkIdPrefix = "cache:ttkUserInfo:ttkId:"
@@ -41,38 +41,30 @@ type (
 	}
 
 	TtkUserInfo struct {
-		Id                  int64          `db:"id"`                    // 用户ID (主键)
-		TtkId               string         `db:"ttk_id"`                // 用户名（唯一）
-		Password            string         `db:"password"`              // 密码（加密存储）
-		Salt                sql.NullString `db:"salt"`                  // 密码（加密存储）
-		NickName            sql.NullString `db:"nick_name"`             // 昵称（可修改,用于显示和@提及）
-		RealName            sql.NullString `db:"real_name"`             // 真实姓名（实名认证）
-		IdCard              sql.NullString `db:"id_card"`               // 身份证ID （实名认证）
-		Gender              sql.NullString `db:"gender"`                // 性别
-		Birthdate           sql.NullTime   `db:"birthdate"`             // 生日
-		AvatarPath          sql.NullString `db:"avatar_path"`           // 头像路径（存储在对象存储中，如S3）
-		Bio                 sql.NullString `db:"bio"`                   // 个人简介
-		Country             sql.NullString `db:"country"`               // 国家/地区
-		City                sql.NullString `db:"city"`                  // 城市
-		Followers           int64          `db:"followers"`             // 关注数
-		Following           int64          `db:"following"`             // 粉丝数
-		Videos              int64          `db:"videos"`                // 视频数
-		PrivateAccount      bool           `db:"private_account"`       // 私密账号设置（公开、仅好友可见、私密等）
-		PushNotifications   bool           `db:"push_notifications"`    // 推送通知设置（点赞、评论、关注等通知）
-		Email               sql.NullString `db:"email"`                 // 邮箱
-		Phone               sql.NullString `db:"phone"`                 // 手机号
-		VerificationStatus  sql.NullString `db:"verification_status"`   // 验证状态（已验证、未验证）
-		AccountStatus       sql.NullString `db:"account_status"`        // 账号状态（正常、封禁、限制等）
-		RegistrationSource  sql.NullString `db:"registration_source"`   // 注册来源（iOS App、Android App、Web等）
-		RegistrationIp      sql.NullString `db:"registration_ip"`       // 注册IP地址
-		LastActive          sql.NullTime   `db:"last_active"`           // 最近活跃时间
-		WalletBalance       float64        `db:"wallet_balance"`        // 钱包余额
-		MessagingPermission sql.NullString `db:"messaging_permission"`  // 私信权限设置
-		TfaEnable           int64          `db:"tfa_enable"`            // 是否启用双因素认证
-		SocialActivityScore int64          `db:"social_activity_score"` // 社交活跃度分析
-		CreatedAt           time.Time      `db:"created_at"`            // 创建时间
-		UpdatedAt           time.Time      `db:"updated_at"`            // 更新时间
-		DeletedAt           sql.NullTime   `db:"deleted_at"`            // 删除时间
+		Id                 int64        `db:"id"`                  // 用户ID (主键)
+		TtkId              string       `db:"ttk_id"`              // 用户名（唯一）
+		Password           string       `db:"password"`            // 密码（加密存储）
+		Salt               string       `db:"salt"`                // 密码（加密存储）
+		NickName           string       `db:"nick_name"`           // 昵称（可修改,用于显示和@提及）
+		RealName           string       `db:"real_name"`           // 真实姓名（实名认证）
+		IdCard             string       `db:"id_card"`             // 身份证ID （实名认证）
+		Gender             int64        `db:"gender"`              // 性别 1：未设置；2：男性；3：女性
+		Birthdate          time.Time    `db:"birthdate"`           // 生日
+		AvatarPath         string       `db:"avatar_path"`         // 头像路径（存储在对象存储中，如S3）
+		Bio                string       `db:"bio"`                 // 个人简介
+		Country            string       `db:"country"`             // 国家/地区
+		City               string       `db:"city"`                // 城市
+		Email              string       `db:"email"`               // 邮箱
+		Phone              string       `db:"phone"`               // 手机号
+		AccountStatus      int64        `db:"account_status"`      // 账号状态（0正常、1封禁、2限制）
+		RegistrationSource string       `db:"registration_source"` // 注册来源（iOS App、Android App、Web等）
+		RegistrationIp     string       `db:"registration_ip"`     // 注册IP地址,ipv4 or ipv6
+		LastActive         time.Time    `db:"last_active"`         // 最近活跃时间
+		WalletBalance      float64      `db:"wallet_balance"`      // 钱包余额
+		CreatedAt          time.Time    `db:"created_at"`          // 创建时间
+		UpdatedAt          time.Time    `db:"updated_at"`          // 更新时间
+		DeletedAt          sql.NullTime `db:"deleted_at"`          // 删除时间
+		DeletedFlag        int64        `db:"deleted_flag"`        // 是否删除 1：正常  2：已删除
 	}
 )
 
@@ -146,8 +138,8 @@ func (m *defaultTtkUserInfoModel) Insert(ctx context.Context, data *TtkUserInfo)
 	ttkUserInfoIdKey := fmt.Sprintf("%s%v", cacheTtkUserInfoIdPrefix, data.Id)
 	ttkUserInfoTtkIdKey := fmt.Sprintf("%s%v", cacheTtkUserInfoTtkIdPrefix, data.TtkId)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, ttkUserInfoRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.TtkId, data.Password, data.Salt, data.NickName, data.RealName, data.IdCard, data.Gender, data.Birthdate, data.AvatarPath, data.Bio, data.Country, data.City, data.Followers, data.Following, data.Videos, data.PrivateAccount, data.PushNotifications, data.Email, data.Phone, data.VerificationStatus, data.AccountStatus, data.RegistrationSource, data.RegistrationIp, data.LastActive, data.WalletBalance, data.MessagingPermission, data.TfaEnable, data.SocialActivityScore)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", m.table, ttkUserInfoRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.TtkId, data.Password, data.Salt, data.NickName, data.RealName, data.IdCard, data.Gender, data.Birthdate, data.AvatarPath, data.Bio, data.Country, data.City, data.Email, data.Phone, data.AccountStatus, data.RegistrationSource, data.RegistrationIp, data.LastActive, data.WalletBalance, data.DeletedAt, data.DeletedFlag)
 	}, ttkUserInfoIdKey, ttkUserInfoTtkIdKey)
 	return ret, err
 }
@@ -162,7 +154,7 @@ func (m *defaultTtkUserInfoModel) Update(ctx context.Context, newData *TtkUserIn
 	ttkUserInfoTtkIdKey := fmt.Sprintf("%s%v", cacheTtkUserInfoTtkIdPrefix, data.TtkId)
 	_, err = m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkUserInfoRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, newData.TtkId, newData.Password, newData.Salt, newData.NickName, newData.RealName, newData.IdCard, newData.Gender, newData.Birthdate, newData.AvatarPath, newData.Bio, newData.Country, newData.City, newData.Followers, newData.Following, newData.Videos, newData.PrivateAccount, newData.PushNotifications, newData.Email, newData.Phone, newData.VerificationStatus, newData.AccountStatus, newData.RegistrationSource, newData.RegistrationIp, newData.LastActive, newData.WalletBalance, newData.MessagingPermission, newData.TfaEnable, newData.SocialActivityScore, newData.Id)
+		return conn.ExecCtx(ctx, query, newData.TtkId, newData.Password, newData.Salt, newData.NickName, newData.RealName, newData.IdCard, newData.Gender, newData.Birthdate, newData.AvatarPath, newData.Bio, newData.Country, newData.City, newData.Email, newData.Phone, newData.AccountStatus, newData.RegistrationSource, newData.RegistrationIp, newData.LastActive, newData.WalletBalance, newData.DeletedAt, newData.DeletedFlag, newData.Id)
 	}, ttkUserInfoIdKey, ttkUserInfoTtkIdKey)
 	return err
 }

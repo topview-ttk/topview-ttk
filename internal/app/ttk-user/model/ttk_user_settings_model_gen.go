@@ -19,8 +19,8 @@ import (
 var (
 	ttkUserSettingsFieldNames          = builder.RawFieldNames(&TtkUserSettings{})
 	ttkUserSettingsRows                = strings.Join(ttkUserSettingsFieldNames, ",")
-	ttkUserSettingsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserSettingsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
-	ttkUserSettingsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserSettingsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
+	ttkUserSettingsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserSettingsFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
+	ttkUserSettingsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserSettingsFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkUserSettingsIdPrefix = "cache:ttkUserSettings:id:"
 )
@@ -40,12 +40,13 @@ type (
 
 	TtkUserSettings struct {
 		Id                      int64          `db:"id"` // 设置ID
-		UserId                  sql.NullInt64  `db:"user_id"`
+		UserId                  int64          `db:"user_id"`
 		NotificationPreferences sql.NullString `db:"notification_preferences"` // 通知首选项（以JSON格式存储）
 		PrivacySettings         sql.NullString `db:"privacy_settings"`         // 隐私设置（以JSON格式存储）
 		CreatedAt               time.Time      `db:"created_at"`               // 创建时间
 		UpdatedAt               time.Time      `db:"updated_at"`               // 更新时间
 		DeletedAt               sql.NullTime   `db:"deleted_at"`               // 删除时间
+		DeletedFlag             int64          `db:"deleted_flag"`             // 是否删除 1：正常  2：已删除
 	}
 )
 
@@ -92,8 +93,8 @@ func (m *defaultTtkUserSettingsModel) FindOne(ctx context.Context, id int64) (*T
 func (m *defaultTtkUserSettingsModel) Insert(ctx context.Context, data *TtkUserSettings) (sql.Result, error) {
 	ttkUserSettingsIdKey := fmt.Sprintf("%s%v", cacheTtkUserSettingsIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, ttkUserSettingsRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.NotificationPreferences, data.PrivacySettings)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?)", m.table, ttkUserSettingsRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.NotificationPreferences, data.PrivacySettings, data.DeletedAt, data.DeletedFlag)
 	}, ttkUserSettingsIdKey)
 	return ret, err
 }
@@ -102,7 +103,7 @@ func (m *defaultTtkUserSettingsModel) Update(ctx context.Context, data *TtkUserS
 	ttkUserSettingsIdKey := fmt.Sprintf("%s%v", cacheTtkUserSettingsIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkUserSettingsRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.NotificationPreferences, data.PrivacySettings, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.NotificationPreferences, data.PrivacySettings, data.DeletedAt, data.DeletedFlag, data.Id)
 	}, ttkUserSettingsIdKey)
 	return err
 }
