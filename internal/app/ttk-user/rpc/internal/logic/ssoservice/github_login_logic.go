@@ -2,8 +2,21 @@ package ssoservicelogic
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/pkg/errors"
+	"github.com/zeromicro/go-zero/core/stores/sqlc"
+	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"io"
+	"io/ioutil"
+	"net/http"
+	"strconv"
+	"time"
+	"topview-ttk/internal/app/ttk-user/model"
+	"topview-ttk/internal/app/ttk-user/rpc/internal/logic/ssoservice/login"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/svc"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
+	"topview-ttk/internal/pkg/database"
+	"topview-ttk/internal/pkg/ttkerr"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -31,96 +44,81 @@ func NewGithubLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Githu
 }
 
 func (l *GithubLoginLogic) GithubLogin(in *user.GitHubLoginRequest) (*user.LoginResponse, error) {
-	//githubToken := in.GetToken()
-	//
-	//url := "https://api.github.com/user"
-	//headers := map[string]string{
-	//	"Authorization": githubToken,
-	//}
-	//
-	//req, err := http.NewRequest("GET", url, nil)
-	//if err != nil {
-	//	fmt.Println("Error creating request:", err)
-	//	return &user.LoginResponse{
-	//		StatusCode: user.StatusCode_INVALID_ARGUMENT,
-	//		Message:    "登录失败",
-	//	}, nil
-	//}
-	//
-	//// 设置请求头部
-	//for key, value := range headers {
-	//	req.Header.Set(key, value)
-	//}
-	//
-	//client := &http.Client{}
-	//resp, err := client.Do(req)
-	//if err != nil {
-	//	fmt.Println("Error sending request:", err)
-	//	return &user.LoginResponse{
-	//		StatusCode: user.StatusCode_INVALID_ARGUMENT,
-	//		Message:    "登录失败",
-	//	}, nil
-	//}
-	//
-	//fmt.Println("Status Code:", resp.Status)
-	//
-	//// 处理响应内容
-	//body, err := ioutil.ReadAll(resp.Body)
-	//if err != nil {
-	//	fmt.Println("Error reading response:", err)
-	//	return &user.LoginResponse{
-	//		StatusCode: user.StatusCode_INVALID_ARGUMENT,
-	//		Message:    "登录失败",
-	//	}, nil
-	//}
-	//var githubUserInfo GithubUserInfo
-	//err = json.Unmarshal(body, &githubUserInfo)
-	//if err != nil {
-	//	fmt.Println("Error decoding JSON:", err)
-	//	return &user.LoginResponse{
-	//		StatusCode: user.StatusCode_INVALID_ARGUMENT,
-	//		Message:    "登录失败",
-	//	}, nil
-	//}
-	//defer func(Body io.ReadCloser) {
-	//	err := Body.Close()
-	//	if err != nil {
-	//
-	//	}
-	//}(resp.Body)
-	//
-	////***************************************************************************
-	//// 通过GithubID来查找user， 查找接口需要重新写
-	//userInfo, err := l.svcCtx.TtkUserInfoModel.FindOne(l.ctx, githubUserInfo.ID)
-	//
-	//if err != nil {
-	//	/***************************************************************************
-	//	// 通过githubUserInfo的信息创建userInfo，自动注册
-	//	   注册逻辑
-	//	 ****************************************************************************/
-	//}
-	//
-	////***************************************************************************
-	//// 注册完成后，再次进行登录
-	////***************************************************************************
-	//
-	//token, err := token.GenerateVfToken(in.DeviceInfo, in.ClientInfo, userInfo.Id)
-	//if err != nil {
-	//	logx.Error(err)
-	//	return &user.LoginResponse{
-	//		StatusCode: user.StatusCode_INVALID_ARGUMENT,
-	//		Message:    "系统繁忙，请重试！",
-	//	}, nil
-	//}
-	//return &user.LoginResponse{
-	//	StatusCode: user.StatusCode_OK,
-	//	Message:    "登录成功，正在加载",
-	//	Token:      token,
-	//	UserInfo: &user.UserInfo{
-	//		Id:       userInfo.Id,
-	//		UserName: userInfo.TtkId,
-	//		NickName: userInfo.NickName.String,
-	//	},
-	//}, nil
-	return &user.LoginResponse{}, nil
+	githubToken := in.GetAccessToken()
+
+	url := "https://api.github.com/user"
+	headers := map[string]string{
+		"Authorization": githubToken,
+	}
+
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.PassportError), "创建Github请求失败，原因：%v,参数：%+v", err, in)
+	}
+
+	// 设置请求头部
+	for key, value := range headers {
+		req.Header.Set(key, value)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.PassportError), "发送Github请求失败，原因：%v,参数：%+v", err, in)
+	}
+
+	// 处理响应内容
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.PassportError), "处理Github响应数据失败，原因：%v,参数：%+v", err, in)
+	}
+	var githubUserInfo GithubUserInfo
+	err = json.Unmarshal(body, &githubUserInfo)
+	if err != nil {
+		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.PassportError), "解析JSON失败，原因：%v,参数：%+v", err, in)
+	}
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+
+		}
+	}(resp.Body)
+	avatarURL := githubUserInfo.AvatarURL
+	id, err := l.svcCtx.TtkThirdPartyBindingModel.FindUserIdByThirdPartyIdAndType(l.ctx, githubUserInfo.ID, "github")
+
+	if err != nil && errors.Is(err, sqlc.ErrNotFound) {
+		if err := database.TransCtx(l.ctx, l.svcCtx.SqlConn, func(ctx context.Context, session sqlx.Session) error {
+			userInfo := login.CreateDefaultUserInfo()
+			userInfo.AvatarPath = avatarURL
+
+			_, err := l.svcCtx.TtkUserInfoModel.TransSaveCtx(ctx, session, userInfo)
+			if err != nil {
+				return err
+			}
+			uid := userInfo.Id
+			if err != nil {
+				return err
+			}
+			githubBinding := &model.TtkThirdPartyBinding{
+				UserId:                uid,
+				ThirdPartyBindingType: 0,
+				ThirdPartyId:          strconv.FormatInt(githubUserInfo.ID, 10),
+				CreatedAt:             time.Time{},
+				UpdatedAt:             time.Now(),
+			}
+			_, err = l.svcCtx.TtkThirdPartyBindingModel.TransSaveCtx(ctx, session, githubBinding)
+			if err != nil {
+				return err
+			}
+			id = uid
+			return nil
+		}); err != nil {
+			return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.DbError), "Github第三方绑定失败, 原因: %v, 参数: %+v", err, in)
+		}
+	} else if err != nil {
+		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.DbError), "获取用户信息失败, 原因: %v, 参数: %+v", err, in)
+	}
+	return &user.LoginResponse{
+		Uid: id,
+	}, nil
 }

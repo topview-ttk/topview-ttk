@@ -1,12 +1,9 @@
 package login
 
 import (
-	"database/sql"
 	"math/big"
-	"math/rand"
-	"strconv"
 	"time"
-	"topview-ttk/internal/app/ttk-user/rpc/model"
+	"topview-ttk/internal/app/ttk-user/model"
 	"topview-ttk/internal/pkg/common"
 )
 
@@ -17,14 +14,27 @@ var base = big.NewInt(int64(len(alphabet)))
 
 // CreateDefaultUserInfo 创建默认的用户角色 todo
 func CreateDefaultUserInfo() *model.TtkUserInfo {
-	// todo 后续添加随机ttk_id机制，64进制a-zA-Z0-9_!
-	i := rand.Int63()
-	id, _ := createTTKId()
+	ttkId, _ := createTTKId()
+	ttkId = "ttk_" + ttkId
 	return &model.TtkUserInfo{
-		Id:        i,
-		TtkId:     "ttk_" + id,
-		NickName:  sql.NullString{String: strconv.FormatInt(time.Now().Unix(), 10), Valid: true},
-		UpdatedAt: time.Now(),
+		Id:                 common.GenerateSnowflakeIdInt64(),
+		TtkId:              ttkId,
+		NickName:           ttkId,
+		Password:           "",
+		Salt:               common.RandAllString(12),
+		Birthdate:          time.Date(1970, 1, 1, 0, 0, 0, 0, time.UTC),
+		RealName:           "",
+		IdCard:             "",
+		AvatarPath:         "",
+		Bio:                "",
+		Country:            "",
+		City:               "",
+		Email:              "",
+		Phone:              "",
+		LastActive:         time.Now(),
+		RegistrationSource: "",
+		RegistrationIp:     "",
+		UpdatedAt:          time.Now(),
 	}
 }
 

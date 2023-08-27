@@ -6,8 +6,8 @@ import (
 	"time"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/svc"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
-	"topview-ttk/internal/pkg/common/token"
-	"topview-ttk/internal/pkg/common/ttkerr"
+	"topview-ttk/internal/pkg/token"
+	"topview-ttk/internal/pkg/ttkerr"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

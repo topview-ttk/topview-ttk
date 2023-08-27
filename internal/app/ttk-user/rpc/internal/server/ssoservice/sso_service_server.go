@@ -49,9 +49,9 @@ func (s *SsoServiceServer) PhonePassLogin(ctx context.Context, in *user.PhonePas
 	return l.PhonePassLogin(in)
 }
 
-func (s *SsoServiceServer) TtkidPassLogin(ctx context.Context, in *user.TTKPassLoginRequest) (*user.LoginResponse, error) {
-	l := ssoservicelogic.NewTtkidPassLoginLogic(ctx, s.svcCtx)
-	return l.TtkidPassLogin(in)
+func (s *SsoServiceServer) TTKIdPassLogin(ctx context.Context, in *user.TTKIdPassLoginRequest) (*user.LoginResponse, error) {
+	l := ssoservicelogic.NewTTKIdPassLoginLogic(ctx, s.svcCtx)
+	return l.TTKIdPassLogin(in)
 }
 
 func (s *SsoServiceServer) EmailPassLogin(ctx context.Context, in *user.EmailPassLoginRequest) (*user.LoginResponse, error) {

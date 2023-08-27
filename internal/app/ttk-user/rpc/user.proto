@@ -6,8 +6,17 @@ option go_package = "./user";
 
 message UserInfo{
   int64 id = 1;
-  string user_name = 2;
-  string nick_name = 3;
+  string ttk_id = 2;
+  string nick_name = 5;
+  int32 gender = 8;
+  string birthdate = 9;
+  string avatar_path = 10;
+  string bio = 11;
+  string country = 12;
+  string city = 13;
+  string email = 14;
+  string phone = 15;
+  int32 account_status = 16;
 }
 
 message GetUserInfoByUidRequest {
@@ -55,68 +64,62 @@ message SendVerificationCodeResponse {
 
 
 // 登录=====
-// 手机验证码登录
-message PhoneVerifyCodeLoginRequest {
-  string phone = 1;
-  string verification_code = 2;
+message LoginCommon {
+  string registration_source = 1;
+  string registration_ip = 2;
   // 设备信息
   string device_info = 3;
   // 客户端版本
   string client_info = 4;
+}
+
+// 手机验证码登录
+message PhoneVerifyCodeLoginRequest {
+  string phone = 1;
+  string verification_code = 2;
+  LoginCommon login_common = 3;
 }
 
 // 邮箱验证码登录
 message EmailVerifyCodeLoginRequest {
   string email = 1;
   string verification_code = 2;
-  // 设备信息
-  string device_info = 3;
-  // 客户端版本
-  string client_info = 4;
+  LoginCommon login_common = 3;
 }
 
 // 手机密码登录
 message PhonePassLoginRequest {
   string phone = 1;
   string pass = 2;
-  // 设备信息
-  string device_info = 3;
-  // 客户端版本
-  string client_info = 4;
+  LoginCommon login_common = 3;
+
 }
 
 // 邮箱登录
 message EmailPassLoginRequest {
   string email = 1;
   string pass = 2;
-  // 设备信息
-  string device_info = 3;
-  // 客户端版本
-  string client_info = 4;
+  LoginCommon login_common = 3;
 }
 
 // ttkId登录
-message TTKPassLoginRequest {
-  string ttkId = 1;
+message TTKIdPassLoginRequest {
+  string ttk_id = 1;
   string pass = 2;
-  // 设备信息
-  string device_info = 3;
-  // 客户端版本
-  string client_info = 4;
+  LoginCommon login_common = 3;
 }
 
 // Github登录
 message GitHubLoginRequest {
-  string token = 1;
+  string access_token = 1;
   // 设备信息
-  string device_info = 2;
-  // 客户端版本
-  string client_info = 3;
+  LoginCommon login_common = 3;
+
 }
 
 // 登录响应
 message LoginResponse {
-  UserInfo userInfo = 3;
+  int64 uid = 1;
 }
 // 登录==========
 
@@ -124,21 +127,20 @@ message LoginResponse {
 // 注册==========
 // 邮箱注册
 message EmailRegisterRequest {
-  string nickname = 1;
+  string nick_name = 1;
   string email = 2;
   string password = 3;
 }
 
 // 手机号注册
 message PhoneRegisterRequest {
-  string nickname = 1;
+  string nick_name = 1;
   string phone = 2;
   string password = 3;
 }
 
 // 注册响应
 message RegisterResponse {
-  string message = 2;
 }
 // 注册==========
 
@@ -151,7 +153,7 @@ message RefreshTokenRequest{
 }
 
 message RefreshTokenResponse{
-  string refToken = 3;
+  string ref_token = 3;
 }
 
 
@@ -164,7 +166,7 @@ service SsoService{
   rpc PhoneVerifyCodeLogin(PhoneVerifyCodeLoginRequest) returns (LoginResponse);
   rpc EmailVerifyCodeLogin(EmailVerifyCodeLoginRequest) returns (LoginResponse);
   rpc PhonePassLogin(PhonePassLoginRequest) returns(LoginResponse);
-  rpc TtkidPassLogin(TTKPassLoginRequest) returns (LoginResponse);
+  rpc TTKIdPassLogin(TTKIdPassLoginRequest) returns (LoginResponse);
   rpc EmailPassLogin(EmailPassLoginRequest) returns (LoginResponse);
   rpc GithubLogin(GitHubLoginRequest) returns (LoginResponse);
 

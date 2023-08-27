@@ -19,8 +19,8 @@ import (
 var (
 	ttkUserLogsFieldNames          = builder.RawFieldNames(&TtkUserLogs{})
 	ttkUserLogsRows                = strings.Join(ttkUserLogsFieldNames, ",")
-	ttkUserLogsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserLogsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
-	ttkUserLogsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserLogsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
+	ttkUserLogsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserLogsFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
+	ttkUserLogsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserLogsFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkUserLogsIdPrefix = "cache:ttkUserLogs:id:"
 )
@@ -39,14 +39,15 @@ type (
 	}
 
 	TtkUserLogs struct {
-		Id         int64          `db:"id"` // 日志ID
-		UserId     sql.NullInt64  `db:"user_id"`
-		LogType    sql.NullString `db:"log_type"`    // 日志类型
-		LogDetails sql.NullString `db:"log_details"` // 日志详情（以JSON格式存储）
-		Timestamp  sql.NullTime   `db:"timestamp"`   // 时间戳
-		CreatedAt  time.Time      `db:"created_at"`  // 创建时间
-		UpdatedAt  time.Time      `db:"updated_at"`  // 更新时间
-		DeletedAt  sql.NullTime   `db:"deleted_at"`  // 删除时间
+		Id          int64        `db:"id"` // 日志ID
+		UserId      int64        `db:"user_id"`
+		LogType     int64        `db:"log_type"`     // 日志类型0登录，1操作，2活动，3其他
+		LogDetails  string       `db:"log_details"`  // 日志详情（以JSON格式存储）
+		Timestamp   time.Time    `db:"timestamp"`    // 时间戳
+		CreatedAt   time.Time    `db:"created_at"`   // 创建时间
+		UpdatedAt   time.Time    `db:"updated_at"`   // 更新时间
+		DeletedAt   sql.NullTime `db:"deleted_at"`   // 删除时间
+		DeletedFlag int64        `db:"deleted_flag"` // 是否删除 1：正常  2：已删除
 	}
 )
 
@@ -93,8 +94,8 @@ func (m *defaultTtkUserLogsModel) FindOne(ctx context.Context, id int64) (*TtkUs
 func (m *defaultTtkUserLogsModel) Insert(ctx context.Context, data *TtkUserLogs) (sql.Result, error) {
 	ttkUserLogsIdKey := fmt.Sprintf("%s%v", cacheTtkUserLogsIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, ttkUserLogsRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.LogType, data.LogDetails, data.Timestamp)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?)", m.table, ttkUserLogsRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.LogType, data.LogDetails, data.Timestamp, data.DeletedAt, data.DeletedFlag)
 	}, ttkUserLogsIdKey)
 	return ret, err
 }
@@ -103,7 +104,7 @@ func (m *defaultTtkUserLogsModel) Update(ctx context.Context, data *TtkUserLogs)
 	ttkUserLogsIdKey := fmt.Sprintf("%s%v", cacheTtkUserLogsIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkUserLogsRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.LogType, data.LogDetails, data.Timestamp, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.LogType, data.LogDetails, data.Timestamp, data.DeletedAt, data.DeletedFlag, data.Id)
 	}, ttkUserLogsIdKey)
 	return err
 }

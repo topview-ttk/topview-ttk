@@ -19,8 +19,8 @@ import (
 var (
 	ttkUserFeedbackFieldNames          = builder.RawFieldNames(&TtkUserFeedback{})
 	ttkUserFeedbackRows                = strings.Join(ttkUserFeedbackFieldNames, ",")
-	ttkUserFeedbackRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserFeedbackFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
-	ttkUserFeedbackRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserFeedbackFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
+	ttkUserFeedbackRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserFeedbackFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
+	ttkUserFeedbackRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserFeedbackFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkUserFeedbackIdPrefix = "cache:ttkUserFeedback:id:"
 )
@@ -39,13 +39,13 @@ type (
 	}
 
 	TtkUserFeedback struct {
-		Id           int64          `db:"id"` // 反馈ID
-		UserId       sql.NullInt64  `db:"user_id"`
-		FeedbackText sql.NullString `db:"feedback_text"` // 反馈内容
-		Timestamp    sql.NullTime   `db:"timestamp"`     // 时间戳
-		CreatedAt    time.Time      `db:"created_at"`    // 创建时间
-		UpdatedAt    time.Time      `db:"updated_at"`    // 更新时间
-		DeletedAt    sql.NullTime   `db:"deleted_at"`    // 删除时间
+		Id           int64        `db:"id"` // 反馈ID
+		UserId       int64        `db:"user_id"`
+		FeedbackText string       `db:"feedback_text"` // 反馈内容
+		CreatedAt    time.Time    `db:"created_at"`    // 创建时间
+		UpdatedAt    time.Time    `db:"updated_at"`    // 更新时间
+		DeletedAt    sql.NullTime `db:"deleted_at"`    // 删除时间
+		DeletedFlag  int64        `db:"deleted_flag"`  // 是否删除 1：正常  2：已删除
 	}
 )
 
@@ -92,8 +92,8 @@ func (m *defaultTtkUserFeedbackModel) FindOne(ctx context.Context, id int64) (*T
 func (m *defaultTtkUserFeedbackModel) Insert(ctx context.Context, data *TtkUserFeedback) (sql.Result, error) {
 	ttkUserFeedbackIdKey := fmt.Sprintf("%s%v", cacheTtkUserFeedbackIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, ttkUserFeedbackRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.FeedbackText, data.Timestamp)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, ttkUserFeedbackRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.FeedbackText, data.DeletedAt, data.DeletedFlag)
 	}, ttkUserFeedbackIdKey)
 	return ret, err
 }
@@ -102,7 +102,7 @@ func (m *defaultTtkUserFeedbackModel) Update(ctx context.Context, data *TtkUserF
 	ttkUserFeedbackIdKey := fmt.Sprintf("%s%v", cacheTtkUserFeedbackIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkUserFeedbackRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.FeedbackText, data.Timestamp, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.FeedbackText, data.DeletedAt, data.DeletedFlag, data.Id)
 	}, ttkUserFeedbackIdKey)
 	return err
 }

@@ -20,6 +20,7 @@ type (
 	GetUserInfoByUidRequest          = user.GetUserInfoByUidRequest
 	GetUserInfoResponse              = user.GetUserInfoResponse
 	GitHubLoginRequest               = user.GitHubLoginRequest
+	LoginCommon                      = user.LoginCommon
 	LoginResponse                    = user.LoginResponse
 	PhonePassLoginRequest            = user.PhonePassLoginRequest
 	PhoneRegisterRequest             = user.PhoneRegisterRequest
@@ -30,7 +31,7 @@ type (
 	SendEmailVerificationCodeRequest = user.SendEmailVerificationCodeRequest
 	SendPhoneVerificationCodeRequest = user.SendPhoneVerificationCodeRequest
 	SendVerificationCodeResponse     = user.SendVerificationCodeResponse
-	TTKPassLoginRequest              = user.TTKPassLoginRequest
+	TTKIdPassLoginRequest            = user.TTKIdPassLoginRequest
 	UserInfo                         = user.UserInfo
 
 	SsoService interface {
@@ -41,7 +42,7 @@ type (
 		PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		PhonePassLogin(ctx context.Context, in *PhonePassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-		TtkidPassLogin(ctx context.Context, in *TTKPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		TTKIdPassLogin(ctx context.Context, in *TTKIdPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		EmailPassLogin(ctx context.Context, in *EmailPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		GithubLogin(ctx context.Context, in *GitHubLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		// 注册
@@ -88,9 +89,9 @@ func (m *defaultSsoService) PhonePassLogin(ctx context.Context, in *PhonePassLog
 	return client.PhonePassLogin(ctx, in, opts...)
 }
 
-func (m *defaultSsoService) TtkidPassLogin(ctx context.Context, in *TTKPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+func (m *defaultSsoService) TTKIdPassLogin(ctx context.Context, in *TTKIdPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	client := user.NewSsoServiceClient(m.cli.Conn())
-	return client.TtkidPassLogin(ctx, in, opts...)
+	return client.TTKIdPassLogin(ctx, in, opts...)
 }
 
 func (m *defaultSsoService) EmailPassLogin(ctx context.Context, in *EmailPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {

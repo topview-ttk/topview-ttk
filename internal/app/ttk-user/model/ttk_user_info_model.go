@@ -7,6 +7,7 @@ import (
 	"github.com/zeromicro/go-zero/core/stores/cache"
 	"github.com/zeromicro/go-zero/core/stores/sqlc"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
+	"topview-ttk/internal/pkg/database"
 )
 
 var _ TtkUserInfoModel = (*customTtkUserInfoModel)(nil)
@@ -28,12 +29,13 @@ type (
 		FindUserCredentialsByEmail(ctx context.Context, email string) (*TtkUserCredentials, error)
 		FindUserCredentialsByTtkId(ctx context.Context, email string) (*TtkUserCredentials, error)
 		FindUserCredentialsByPhone(ctx context.Context, email string) (*TtkUserCredentials, error)
+		TransSaveCtx(ctx context.Context, session sqlx.Session, data *TtkUserInfo) (sql.Result, error)
 	}
 
 	TtkUserCredentials struct {
-		Id       int64          `db:"id"`       // 用户ID (主键)
-		Password string         `db:"password"` // 密码（加密存储）
-		Salt     sql.NullString `db:"salt"`     // 密码（加密存储）
+		Id       int64  `db:"id"`       // 用户ID (主键)
+		Password string `db:"password"` // 密码（加密存储）
+		Salt     string `db:"salt"`     // 密码（加密存储）
 	}
 
 	customTtkUserInfoModel struct {
@@ -122,4 +124,10 @@ func (m *customTtkUserInfoModel) FindUserCredentialsByPhone(ctx context.Context,
 	default:
 		return nil, err
 	}
+}
+
+func (m *customTtkUserInfoModel) TransSaveCtx(ctx context.Context, session sqlx.Session, data *TtkUserInfo) (sql.Result, error) {
+	saveSql := database.SaveSqlJoins(data, m.table)
+	res, err := session.ExecCtx(ctx, saveSql)
+	return res, err
 }

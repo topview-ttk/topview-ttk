@@ -2,13 +2,12 @@ package ssoservicelogic
 
 import (
 	"context"
-	"fmt"
 	"github.com/pkg/errors"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/logic/ssoservice/send"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/svc"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/util"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
-	"topview-ttk/internal/pkg/common/ttkerr"
+	"topview-ttk/internal/pkg/ttkerr"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -42,8 +41,7 @@ func (l *SendEmailVerificationCodeLogic) SendEmailVerificationCode(in *user.Send
 	send.StoreVerificationCode(l.ctx, l.svcCtx.Rdb, in.GetEmail(), code)
 	err := send.SMTPEmail(in.GetEmail(), code)
 	if err != nil {
-		fmt.Println(err)
-		logx.Error(err)
+		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.ServerCommonError), "发送验证码失败，参数：%+v", in)
 	}
 	return &user.SendVerificationCodeResponse{}, nil
 }

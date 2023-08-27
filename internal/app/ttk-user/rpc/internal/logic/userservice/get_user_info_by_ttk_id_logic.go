@@ -2,9 +2,10 @@ package userservicelogic
 
 import (
 	"context"
+	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
-	"topview-ttk/internal/app/ttk-user/rpc/model"
-	"topview-ttk/internal/pkg/common/ttkerr"
+	"topview-ttk/internal/app/ttk-user/model"
+	"topview-ttk/internal/pkg/ttkerr"
 
 	"topview-ttk/internal/app/ttk-user/rpc/internal/svc"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
@@ -35,9 +36,10 @@ func (l *GetUserInfoByTTKIdLogic) GetUserInfoByTTKId(in *user.GetUserInfoByTTKId
 	if err != nil && errors.Is(err, model.ErrNotFound) {
 		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.UserNotFountError), "用户不存在 ,参数 :%+v", in)
 	}
-	return &user.GetUserInfoResponse{UserInfo: &user.UserInfo{
-		Id:       u.Id,
-		UserName: u.TtkId,
-		NickName: u.NickName.String,
-	}}, nil
+	var ur = &user.UserInfo{}
+	err = copier.Copy(u, ur)
+	if err != nil {
+		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.ServerCommonError), "用户数据映射失败 ,参数 :%+v", u)
+	}
+	return &user.GetUserInfoResponse{UserInfo: ur}, nil
 }

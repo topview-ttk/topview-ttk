@@ -19,8 +19,8 @@ import (
 var (
 	ttkUserLocationsFieldNames          = builder.RawFieldNames(&TtkUserLocations{})
 	ttkUserLocationsRows                = strings.Join(ttkUserLocationsFieldNames, ",")
-	ttkUserLocationsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserLocationsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
-	ttkUserLocationsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserLocationsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
+	ttkUserLocationsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserLocationsFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
+	ttkUserLocationsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserLocationsFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkUserLocationsIdPrefix = "cache:ttkUserLocations:id:"
 )
@@ -39,14 +39,15 @@ type (
 	}
 
 	TtkUserLocations struct {
-		Id           int64           `db:"id"` // 地理位置ID
-		UserId       sql.NullInt64   `db:"user_id"`
-		Latitude     sql.NullFloat64 `db:"latitude"`      // 纬度
-		Longitude    sql.NullFloat64 `db:"longitude"`     // 经度
-		LocationName sql.NullString  `db:"location_name"` // 位置名称
-		CreatedAt    time.Time       `db:"created_at"`    // 创建时间
-		UpdatedAt    time.Time       `db:"updated_at"`    // 更新时间
-		DeletedAt    sql.NullTime    `db:"deleted_at"`    // 删除时间
+		Id           int64        `db:"id"` // 地理位置ID
+		UserId       int64        `db:"user_id"`
+		Latitude     float64      `db:"latitude"`      // 纬度
+		Longitude    float64      `db:"longitude"`     // 经度
+		LocationName string       `db:"location_name"` // 位置名称
+		CreatedAt    time.Time    `db:"created_at"`    // 创建时间
+		UpdatedAt    time.Time    `db:"updated_at"`    // 更新时间
+		DeletedAt    sql.NullTime `db:"deleted_at"`    // 删除时间
+		DeletedFlag  int64        `db:"deleted_flag"`  // 是否删除 1：正常  2：已删除
 	}
 )
 
@@ -93,8 +94,8 @@ func (m *defaultTtkUserLocationsModel) FindOne(ctx context.Context, id int64) (*
 func (m *defaultTtkUserLocationsModel) Insert(ctx context.Context, data *TtkUserLocations) (sql.Result, error) {
 	ttkUserLocationsIdKey := fmt.Sprintf("%s%v", cacheTtkUserLocationsIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, ttkUserLocationsRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.Latitude, data.Longitude, data.LocationName)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?)", m.table, ttkUserLocationsRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.Latitude, data.Longitude, data.LocationName, data.DeletedAt, data.DeletedFlag)
 	}, ttkUserLocationsIdKey)
 	return ret, err
 }
@@ -103,7 +104,7 @@ func (m *defaultTtkUserLocationsModel) Update(ctx context.Context, data *TtkUser
 	ttkUserLocationsIdKey := fmt.Sprintf("%s%v", cacheTtkUserLocationsIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkUserLocationsRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.Latitude, data.Longitude, data.LocationName, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.Latitude, data.Longitude, data.LocationName, data.DeletedAt, data.DeletedFlag, data.Id)
 	}, ttkUserLocationsIdKey)
 	return err
 }

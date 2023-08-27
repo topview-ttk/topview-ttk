@@ -22,52 +22,53 @@ type (
 
 // 登录=====
 type (
+	LoginCommon {
+		DeviceInfo         string `json:"device_info"`
+		ClientInfo         string `json:"client_info"`
+		RegistrationSource string `json:"registration_source"`
+		RegistrationIp     string `json:"registration_ip"`
+	}
+
 	// 手机验证码登录
 	PhoneVerifyCodeLoginRequest {
-		Phone            string `json:"phone"`
-		VerificationCode string `json:"verification_code"`
-		DeviceInfo       string `json:"device_info"`
-		ClientInfo       string `json:"client_info"`
+		Phone            string      `json:"phone"`
+		VerificationCode string      `json:"verification_code"`
+		LoginCommon      LoginCommon `json:"login_common"`
 	}
 	// 邮箱验证码登录
 	EmailVerifyCodeLoginRequest {
-		Email            string `json:"email"`
-		VerificationCode string `json:"verification_code"`
-		DeviceInfo       string `json:"device_info"`
-		ClientInfo       string `json:"client_info"`
+		Email            string      `json:"email"`
+		VerificationCode string      `json:"verification_code"`
+		LoginCommon      LoginCommon `json:"login_common"`
 	}
 	// 手机密码登录
 	PhonePassLoginRequest {
-		Phone      string `json:"phone"`
-		Password   string `json:"password"`
-		DeviceInfo string `json:"device_info"`
-		ClientInfo string `json:"client_info"`
+		Phone       string      `json:"phone"`
+		Password    string      `json:"password"`
+		LoginCommon LoginCommon `json:"login_common"`
 	}
 	// 邮箱密码登录
 	EmailLoginRequest {
-		Email      string `json:"email"`
-		Password   string `json:"password"`
-		DeviceInfo string `json:"device_info"`
-		ClientInfo string `json:"client_info"`
+		Email       string      `json:"email"`
+		Password    string      `json:"password"`
+		LoginCommon LoginCommon `json:"login_common"`
 	}
 	// ttk_id密码登录
 	TTkIDLoginRequest {
-		TTkId      string `json:"ttk_id"`
-		Password   string `json:"password"`
-		DeviceInfo string `json:"device_info"`
-		ClientInfo string `json:"client_info"`
+		TTkId       string      `json:"ttk_id"`
+		Password    string      `json:"password"`
+		LoginCommon LoginCommon `json:"login_common"`
 	}
 	// GitHub登录
 	GithubLoginRequest {
-		Token      string `json:"token"`
-		DeviceInfo string `json:"device_info"`
-		ClientInfo string `json:"client_info"`
+		Token       string      `json:"token"`
+		LoginCommon LoginCommon `json:"login_common"`
 	}
 
 	// 登录响应
 	LoginResponse {
 		Token        string `json:"token"`
-		TokenExpires string `json:"token_expires"`
+		TokenExpires int64  `json:"token_expires"`
 	}
 )
 // 登录=====
@@ -103,10 +104,6 @@ type (
 		RefToken string `json:"ref_token"`
 	}
 )
-
-type UserInfo {
-	TTkId string `json:"ttk_id"`
-}
 
 @server(
 	prefix: /v1
@@ -161,6 +158,21 @@ service api_server {
 }
 
 type (
+	UserInfo {
+		ID            int64  `json:"id"`
+		TTkID         string `json:"ttk_id"`
+		NickName      string `json:"nick_name"`
+		Gender        int32  `json:"gender"`
+		Birthdate     string `json:"birthdate"`
+		AvatarPath    string `json:"avatar_path"`
+		Bio           string `json:"bio"`
+		Country       string `json:"country"`
+		City          string `json:"city"`
+		Email         string `json:"email"`
+		Phone         string `json:"phone"`
+		AccountStatus int32  `json:"account_status"`
+	}
+
 	GetUserInfoByUidRequest {
 		Uid int64 `form:"uid"`
 	}
@@ -183,4 +195,21 @@ service api_server {
 
 	@handler GetUserInfoByTTKId
 	get /user/infoByTTKId (GetUserInfoByTTKIdRequest) returns (GetUserInfoResponse)
+}
+
+type (
+	GetUserSelf {
+	}
+	GetUserSelfResponse {
+		UserInfo UserInfo `json:"user_info"`
+	}
+)
+@server(
+	prefix: /v1
+	group: userA
+	jwt : Auth
+)
+service api_server {
+	@handler GetUserInfoSelf
+	get /user/self () returns (GetUserSelfResponse)
 }

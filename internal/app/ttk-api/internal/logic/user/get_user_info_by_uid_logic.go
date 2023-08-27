@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
 
@@ -32,5 +33,10 @@ func (l *GetUserInfoByUidLogic) GetUserInfoByUid(req *types.GetUserInfoByUidRequ
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-	return &types.GetUserInfoResponse{UserInfo: types.UserInfo{TTkId: rpcResp.UserInfo.GetUserName()}}, nil
+	var uf = &types.UserInfo{}
+	err = copier.Copy(uf, rpcResp.UserInfo)
+	if err != nil {
+		return nil, errors.Wrapf(err, "req: %+v", req)
+	}
+	return &types.GetUserInfoResponse{UserInfo: *uf}, nil
 }

@@ -2,7 +2,7 @@ package rpc
 
 import (
 	"context"
-	"topview-ttk/internal/pkg/common/ttkerr"
+	"topview-ttk/internal/pkg/ttkerr"
 
 	"github.com/pkg/errors"
 	"github.com/zeromicro/go-zero/core/logx"

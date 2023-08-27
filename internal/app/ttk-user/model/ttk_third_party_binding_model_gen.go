@@ -19,8 +19,8 @@ import (
 var (
 	ttkThirdPartyBindingFieldNames          = builder.RawFieldNames(&TtkThirdPartyBinding{})
 	ttkThirdPartyBindingRows                = strings.Join(ttkThirdPartyBindingFieldNames, ",")
-	ttkThirdPartyBindingRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkThirdPartyBindingFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
-	ttkThirdPartyBindingRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkThirdPartyBindingFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
+	ttkThirdPartyBindingRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkThirdPartyBindingFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
+	ttkThirdPartyBindingRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkThirdPartyBindingFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkThirdPartyBindingIdPrefix = "cache:ttkThirdPartyBinding:id:"
 )
@@ -39,13 +39,14 @@ type (
 	}
 
 	TtkThirdPartyBinding struct {
-		Id                    int64          `db:"id"` // 第三方登录绑定ID
-		UserId                sql.NullInt64  `db:"user_id"`
-		ThirdPartyBindingType sql.NullString `db:"third_party_binding_type"` // 第三方登录类型
-		ThirdPartyId          sql.NullString `db:"third_party_id"`           // 第三方登录ID
-		CreatedAt             time.Time      `db:"created_at"`               // 创建时间
-		UpdatedAt             time.Time      `db:"updated_at"`               // 更新时间
-		DeletedAt             sql.NullTime   `db:"deleted_at"`               // 删除时间
+		Id                    int64        `db:"id"`                       // 第三方登录绑定ID
+		UserId                int64        `db:"user_id"`                  // 用户ID
+		ThirdPartyBindingType int64        `db:"third_party_binding_type"` // 第三方登录类型,GitHub为0，Google为1，FaceBook为2
+		ThirdPartyId          string       `db:"third_party_id"`           // 第三方登录ID
+		CreatedAt             time.Time    `db:"created_at"`               // 创建时间
+		UpdatedAt             time.Time    `db:"updated_at"`               // 更新时间
+		DeletedAt             sql.NullTime `db:"deleted_at"`               // 删除时间
+		DeletedFlag           int64        `db:"deleted_flag"`             // 是否删除 1：正常  2：已删除
 	}
 )
 
@@ -92,8 +93,8 @@ func (m *defaultTtkThirdPartyBindingModel) FindOne(ctx context.Context, id int64
 func (m *defaultTtkThirdPartyBindingModel) Insert(ctx context.Context, data *TtkThirdPartyBinding) (sql.Result, error) {
 	ttkThirdPartyBindingIdKey := fmt.Sprintf("%s%v", cacheTtkThirdPartyBindingIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?)", m.table, ttkThirdPartyBindingRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.ThirdPartyBindingType, data.ThirdPartyId)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?)", m.table, ttkThirdPartyBindingRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.ThirdPartyBindingType, data.ThirdPartyId, data.DeletedAt, data.DeletedFlag)
 	}, ttkThirdPartyBindingIdKey)
 	return ret, err
 }
@@ -102,7 +103,7 @@ func (m *defaultTtkThirdPartyBindingModel) Update(ctx context.Context, data *Ttk
 	ttkThirdPartyBindingIdKey := fmt.Sprintf("%s%v", cacheTtkThirdPartyBindingIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkThirdPartyBindingRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.ThirdPartyBindingType, data.ThirdPartyId, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.ThirdPartyBindingType, data.ThirdPartyId, data.DeletedAt, data.DeletedFlag, data.Id)
 	}, ttkThirdPartyBindingIdKey)
 	return err
 }

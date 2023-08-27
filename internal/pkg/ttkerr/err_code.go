@@ -53,5 +53,5 @@ const (
 
 	SendVerifyCodeFrequentError
 
-	TTIdValidError
+	TTKIdValidError
 )

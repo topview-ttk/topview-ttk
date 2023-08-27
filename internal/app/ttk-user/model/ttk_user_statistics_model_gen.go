@@ -19,8 +19,8 @@ import (
 var (
 	ttkUserStatisticsFieldNames          = builder.RawFieldNames(&TtkUserStatistics{})
 	ttkUserStatisticsRows                = strings.Join(ttkUserStatisticsFieldNames, ",")
-	ttkUserStatisticsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserStatisticsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), ",")
-	ttkUserStatisticsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserStatisticsFieldNames, "`id`", "`created_at`", "`deleted_at`", "`updated_at`"), "=?,") + "=?"
+	ttkUserStatisticsRowsExpectAutoSet   = strings.Join(stringx.Remove(ttkUserStatisticsFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), ",")
+	ttkUserStatisticsRowsWithPlaceHolder = strings.Join(stringx.Remove(ttkUserStatisticsFieldNames, "`id`", "`create_at`", "`create_time`", "`created_at`", "`update_at`", "`update_time`", "`updated_at`"), "=?,") + "=?"
 
 	cacheTtkUserStatisticsIdPrefix = "cache:ttkUserStatistics:id:"
 )
@@ -47,6 +47,7 @@ type (
 		CreatedAt     time.Time     `db:"created_at"`     // 创建时间
 		UpdatedAt     time.Time     `db:"updated_at"`     // 更新时间
 		DeletedAt     sql.NullTime  `db:"deleted_at"`     // 删除时间
+		DeletedFlag   int64         `db:"deleted_flag"`   // 是否删除 1：正常  2：已删除
 	}
 )
 
@@ -93,8 +94,8 @@ func (m *defaultTtkUserStatisticsModel) FindOne(ctx context.Context, id int64) (
 func (m *defaultTtkUserStatisticsModel) Insert(ctx context.Context, data *TtkUserStatistics) (sql.Result, error) {
 	ttkUserStatisticsIdKey := fmt.Sprintf("%s%v", cacheTtkUserStatisticsIdPrefix, data.Id)
 	ret, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
-		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?)", m.table, ttkUserStatisticsRowsExpectAutoSet)
-		return conn.ExecCtx(ctx, query, data.UserId, data.PostsCount, data.CommentsCount, data.LikesCount)
+		query := fmt.Sprintf("insert into %s (%s) values (?, ?, ?, ?, ?, ?)", m.table, ttkUserStatisticsRowsExpectAutoSet)
+		return conn.ExecCtx(ctx, query, data.UserId, data.PostsCount, data.CommentsCount, data.LikesCount, data.DeletedAt, data.DeletedFlag)
 	}, ttkUserStatisticsIdKey)
 	return ret, err
 }
@@ -103,7 +104,7 @@ func (m *defaultTtkUserStatisticsModel) Update(ctx context.Context, data *TtkUse
 	ttkUserStatisticsIdKey := fmt.Sprintf("%s%v", cacheTtkUserStatisticsIdPrefix, data.Id)
 	_, err := m.ExecCtx(ctx, func(ctx context.Context, conn sqlx.SqlConn) (result sql.Result, err error) {
 		query := fmt.Sprintf("update %s set %s where `id` = ?", m.table, ttkUserStatisticsRowsWithPlaceHolder)
-		return conn.ExecCtx(ctx, query, data.UserId, data.PostsCount, data.CommentsCount, data.LikesCount, data.Id)
+		return conn.ExecCtx(ctx, query, data.UserId, data.PostsCount, data.CommentsCount, data.LikesCount, data.DeletedAt, data.DeletedFlag, data.Id)
 	}, ttkUserStatisticsIdKey)
 	return err
 }

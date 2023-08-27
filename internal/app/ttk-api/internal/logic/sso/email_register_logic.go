@@ -28,7 +28,7 @@ func NewEmailRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ema
 func (l *EmailRegisterLogic) EmailRegister(req *types.EmailRegisterRequest) (resp *types.RegisterResponse, err error) {
 	_, err = l.svcCtx.SsoClient.EmailRegister(l.ctx, &user.EmailRegisterRequest{
 		Email:    req.Email,
-		Nickname: req.NickName,
+		NickName: req.NickName,
 		Password: req.Password,
 	})
 

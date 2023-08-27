@@ -16,50 +16,51 @@ type SendEmailVerificationCodeRequest struct {
 type SendVerificationCodeResponse struct {
 }
 
+type LoginCommon struct {
+	DeviceInfo         string `json:"device_info"`
+	ClientInfo         string `json:"client_info"`
+	RegistrationSource string `json:"registration_source"`
+	RegistrationIp     string `json:"registration_ip"`
+}
+
 type PhoneVerifyCodeLoginRequest struct {
-	Phone            string `json:"phone"`
-	VerificationCode string `json:"verification_code"`
-	DeviceInfo       string `json:"device_info"`
-	ClientInfo       string `json:"client_info"`
+	Phone            string      `json:"phone"`
+	VerificationCode string      `json:"verification_code"`
+	LoginCommon      LoginCommon `json:"login_common"`
 }
 
 type EmailVerifyCodeLoginRequest struct {
-	Email            string `json:"email"`
-	VerificationCode string `json:"verification_code"`
-	DeviceInfo       string `json:"device_info"`
-	ClientInfo       string `json:"client_info"`
+	Email            string      `json:"email"`
+	VerificationCode string      `json:"verification_code"`
+	LoginCommon      LoginCommon `json:"login_common"`
 }
 
 type PhonePassLoginRequest struct {
-	Phone      string `json:"phone"`
-	Password   string `json:"password"`
-	DeviceInfo string `json:"device_info"`
-	ClientInfo string `json:"client_info"`
+	Phone       string      `json:"phone"`
+	Password    string      `json:"password"`
+	LoginCommon LoginCommon `json:"login_common"`
 }
 
 type EmailLoginRequest struct {
-	Email      string `json:"email"`
-	Password   string `json:"password"`
-	DeviceInfo string `json:"device_info"`
-	ClientInfo string `json:"client_info"`
+	Email       string      `json:"email"`
+	Password    string      `json:"password"`
+	LoginCommon LoginCommon `json:"login_common"`
 }
 
 type TTkIDLoginRequest struct {
-	TTkId      string `json:"ttk_id"`
-	Password   string `json:"password"`
-	DeviceInfo string `json:"device_info"`
-	ClientInfo string `json:"client_info"`
+	TTkId       string      `json:"ttk_id"`
+	Password    string      `json:"password"`
+	LoginCommon LoginCommon `json:"login_common"`
 }
 
 type GithubLoginRequest struct {
-	Token      string `json:"token"`
-	DeviceInfo string `json:"device_info"`
-	ClientInfo string `json:"client_info"`
+	Token       string      `json:"token"`
+	LoginCommon LoginCommon `json:"login_common"`
 }
 
 type LoginResponse struct {
 	Token        string `json:"token"`
-	TokenExpires string `json:"token_expires"`
+	TokenExpires int64  `json:"token_expires"`
 }
 
 type PhoneRegisterRequest struct {
@@ -86,7 +87,18 @@ type RefreshTokenResponse struct {
 }
 
 type UserInfo struct {
-	TTkId string `json:"ttk_id"`
+	ID            int64  `json:"id"`
+	TTkID         string `json:"ttk_id"`
+	NickName      string `json:"nick_name"`
+	Gender        int32  `json:"gender"`
+	Birthdate     string `json:"birthdate"`
+	AvatarPath    string `json:"avatar_path"`
+	Bio           string `json:"bio"`
+	Country       string `json:"country"`
+	City          string `json:"city"`
+	Email         string `json:"email"`
+	Phone         string `json:"phone"`
+	AccountStatus int32  `json:"account_status"`
 }
 
 type GetUserInfoByUidRequest struct {
@@ -98,5 +110,12 @@ type GetUserInfoByTTKIdRequest struct {
 }
 
 type GetUserInfoResponse struct {
+	UserInfo UserInfo `json:"user_info"`
+}
+
+type GetUserSelf struct {
+}
+
+type GetUserSelfResponse struct {
 	UserInfo UserInfo `json:"user_info"`
 }

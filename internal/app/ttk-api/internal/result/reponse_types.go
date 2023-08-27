@@ -1,6 +1,8 @@
 package result
 
-import "topview-ttk/internal/pkg/common/ttkerr"
+import (
+	"topview-ttk/internal/pkg/ttkerr"
+)
 
 type ResponseSuccess struct {
 	Code uint32      `json:"code"`

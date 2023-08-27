@@ -2,9 +2,10 @@ package sso
 
 import (
 	"context"
+	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
-	"topview-ttk/internal/pkg/common/token"
+	"topview-ttk/internal/pkg/token"
 
 	"topview-ttk/internal/app/ttk-api/internal/svc"
 	"topview-ttk/internal/app/ttk-api/internal/types"
@@ -27,22 +28,26 @@ func NewEmailPassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Em
 }
 
 func (l *EmailPassLoginLogic) EmailPassLogin(req *types.EmailLoginRequest) (resp *types.LoginResponse, err error) {
-
+	var rpcLoginCommon = &user.LoginCommon{}
+	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
+	if err != nil {
+		return nil, errors.Wrapf(err, "req: %+v", req)
+	}
 	rpcResp, err := l.svcCtx.SsoClient.EmailPassLogin(l.ctx, &user.EmailPassLoginRequest{
-		Email:      req.Email,
-		Pass:       req.Password,
-		DeviceInfo: req.DeviceInfo,
-		ClientInfo: req.ClientInfo,
+		Email:       req.Email,
+		Pass:        req.Password,
+		LoginCommon: rpcLoginCommon,
 	})
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-	t, err := token.GenerateVfToken(req.DeviceInfo, req.ClientInfo, rpcResp.UserInfo.Id)
+	t, err := token.GenerateVfToken(req.LoginCommon.DeviceInfo, req.LoginCommon.ClientInfo, rpcResp.Uid)
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
 	return &types.LoginResponse{
-		Token: t,
+		Token:        t,
+		TokenExpires: token.TokenExpires.Nanoseconds(),
 	}, err
 }
