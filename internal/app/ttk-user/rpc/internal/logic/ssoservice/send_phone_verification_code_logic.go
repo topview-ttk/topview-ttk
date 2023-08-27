@@ -7,7 +7,7 @@ import (
 	"topview-ttk/internal/app/ttk-user/rpc/internal/svc"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/util"
 	"topview-ttk/internal/app/ttk-user/rpc/user"
-	"topview-ttk/internal/pkg/common/ttkerr"
+	"topview-ttk/internal/pkg/ttkerr"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -41,7 +41,8 @@ func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(in *user.Send
 	send.StoreVerificationCode(l.ctx, l.svcCtx.Rdb, in.GetPhone(), code)
 	err := send.AliyunSMS(in.GetPhone(), code)
 	if err != nil {
-		logx.Error(err)
+		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.ServerCommonError), "发送验证码失败，参数：%+v", in)
+
 	}
 	return &user.SendVerificationCodeResponse{}, nil
 }

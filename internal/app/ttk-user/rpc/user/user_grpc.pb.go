@@ -151,7 +151,7 @@ const (
 	SsoService_PhoneVerifyCodeLogin_FullMethodName      = "/user.SsoService/PhoneVerifyCodeLogin"
 	SsoService_EmailVerifyCodeLogin_FullMethodName      = "/user.SsoService/EmailVerifyCodeLogin"
 	SsoService_PhonePassLogin_FullMethodName            = "/user.SsoService/PhonePassLogin"
-	SsoService_TtkidPassLogin_FullMethodName            = "/user.SsoService/TtkidPassLogin"
+	SsoService_TTKIdPassLogin_FullMethodName            = "/user.SsoService/TTKIdPassLogin"
 	SsoService_EmailPassLogin_FullMethodName            = "/user.SsoService/EmailPassLogin"
 	SsoService_GithubLogin_FullMethodName               = "/user.SsoService/GithubLogin"
 	SsoService_EmailRegister_FullMethodName             = "/user.SsoService/EmailRegister"
@@ -170,7 +170,7 @@ type SsoServiceClient interface {
 	PhoneVerifyCodeLogin(ctx context.Context, in *PhoneVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	EmailVerifyCodeLogin(ctx context.Context, in *EmailVerifyCodeLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	PhonePassLogin(ctx context.Context, in *PhonePassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-	TtkidPassLogin(ctx context.Context, in *TTKPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+	TTKIdPassLogin(ctx context.Context, in *TTKIdPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	EmailPassLogin(ctx context.Context, in *EmailPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	GithubLogin(ctx context.Context, in *GitHubLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 	// 注册
@@ -232,9 +232,9 @@ func (c *ssoServiceClient) PhonePassLogin(ctx context.Context, in *PhonePassLogi
 	return out, nil
 }
 
-func (c *ssoServiceClient) TtkidPassLogin(ctx context.Context, in *TTKPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+func (c *ssoServiceClient) TTKIdPassLogin(ctx context.Context, in *TTKIdPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	out := new(LoginResponse)
-	err := c.cc.Invoke(ctx, SsoService_TtkidPassLogin_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, SsoService_TTKIdPassLogin_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -297,7 +297,7 @@ type SsoServiceServer interface {
 	PhoneVerifyCodeLogin(context.Context, *PhoneVerifyCodeLoginRequest) (*LoginResponse, error)
 	EmailVerifyCodeLogin(context.Context, *EmailVerifyCodeLoginRequest) (*LoginResponse, error)
 	PhonePassLogin(context.Context, *PhonePassLoginRequest) (*LoginResponse, error)
-	TtkidPassLogin(context.Context, *TTKPassLoginRequest) (*LoginResponse, error)
+	TTKIdPassLogin(context.Context, *TTKIdPassLoginRequest) (*LoginResponse, error)
 	EmailPassLogin(context.Context, *EmailPassLoginRequest) (*LoginResponse, error)
 	GithubLogin(context.Context, *GitHubLoginRequest) (*LoginResponse, error)
 	// 注册
@@ -326,8 +326,8 @@ func (UnimplementedSsoServiceServer) EmailVerifyCodeLogin(context.Context, *Emai
 func (UnimplementedSsoServiceServer) PhonePassLogin(context.Context, *PhonePassLoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PhonePassLogin not implemented")
 }
-func (UnimplementedSsoServiceServer) TtkidPassLogin(context.Context, *TTKPassLoginRequest) (*LoginResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method TtkidPassLogin not implemented")
+func (UnimplementedSsoServiceServer) TTKIdPassLogin(context.Context, *TTKIdPassLoginRequest) (*LoginResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method TTKIdPassLogin not implemented")
 }
 func (UnimplementedSsoServiceServer) EmailPassLogin(context.Context, *EmailPassLoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method EmailPassLogin not implemented")
@@ -447,20 +447,20 @@ func _SsoService_PhonePassLogin_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
-func _SsoService_TtkidPassLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TTKPassLoginRequest)
+func _SsoService_TTKIdPassLogin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(TTKIdPassLoginRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(SsoServiceServer).TtkidPassLogin(ctx, in)
+		return srv.(SsoServiceServer).TTKIdPassLogin(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: SsoService_TtkidPassLogin_FullMethodName,
+		FullMethod: SsoService_TTKIdPassLogin_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(SsoServiceServer).TtkidPassLogin(ctx, req.(*TTKPassLoginRequest))
+		return srv.(SsoServiceServer).TTKIdPassLogin(ctx, req.(*TTKIdPassLoginRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -583,8 +583,8 @@ var SsoService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _SsoService_PhonePassLogin_Handler,
 		},
 		{
-			MethodName: "TtkidPassLogin",
-			Handler:    _SsoService_TtkidPassLogin_Handler,
+			MethodName: "TTKIdPassLogin",
+			Handler:    _SsoService_TTKIdPassLogin_Handler,
 		},
 		{
 			MethodName: "EmailPassLogin",

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	ssoserver "topview-ttk/internal/app/ttk-user/rpc/internal/server/ssoservice"
 	userserver "topview-ttk/internal/app/ttk-user/rpc/internal/server/userservice"
-	"topview-ttk/internal/pkg/common/interceptor/rpc"
+	"topview-ttk/internal/pkg/interceptor/rpc"
 
 	"topview-ttk/internal/app/ttk-user/rpc/internal/config"
 	"topview-ttk/internal/app/ttk-user/rpc/internal/svc"
