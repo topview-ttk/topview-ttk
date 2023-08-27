@@ -34,7 +34,7 @@ func (l *GetUserInfoByUidLogic) GetUserInfoByUid(req *types.GetUserInfoByUidRequ
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
 	var uf = &types.UserInfo{}
-	err = copier.Copy(rpcResp, uf)
+	err = copier.Copy(uf, rpcResp.UserInfo)
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}

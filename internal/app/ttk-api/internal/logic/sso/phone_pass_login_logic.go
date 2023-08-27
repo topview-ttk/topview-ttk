@@ -29,7 +29,8 @@ func NewPhonePassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ph
 
 func (l *PhonePassLoginLogic) PhonePassLogin(req *types.PhonePassLoginRequest) (resp *types.LoginResponse, err error) {
 	var rpcLoginCommon = &user.LoginCommon{}
-	err = copier.Copy(&req.LoginCommon, rpcLoginCommon)
+	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
+
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}

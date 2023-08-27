@@ -29,7 +29,8 @@ func NewTtkidPassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Tt
 
 func (l *TtkidPassLoginLogic) TtkidPassLogin(req *types.TTkIDLoginRequest) (resp *types.LoginResponse, err error) {
 	var rpcLoginCommon = &user.LoginCommon{}
-	err = copier.Copy(&req.LoginCommon, rpcLoginCommon)
+	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
+
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}

@@ -29,7 +29,8 @@ func NewGithubLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Githu
 
 func (l *GithubLoginLogic) GithubLogin(req *types.GithubLoginRequest) (resp *types.LoginResponse, err error) {
 	var rpcLoginCommon = &user.LoginCommon{}
-	err = copier.Copy(&req.LoginCommon, rpcLoginCommon)
+	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
+
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}

@@ -29,7 +29,7 @@ func NewEmailVerifyCodeLoginLogic(ctx context.Context, svcCtx *svc.ServiceContex
 
 func (l *EmailVerifyCodeLoginLogic) EmailVerifyCodeLogin(req *types.EmailVerifyCodeLoginRequest) (resp *types.LoginResponse, err error) {
 	var rpcLoginCommon = &user.LoginCommon{}
-	err = copier.Copy(&req.LoginCommon, rpcLoginCommon)
+	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
