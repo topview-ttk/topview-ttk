@@ -27,7 +27,7 @@ func userServiceErrorInit() {
 	message[VerifyCodeNotFoundError] = "验证码错误"
 	message[VerifyCodeJudgeError] = "验证码错误"
 	message[SendVerifyCodeFrequentError] = "发送验证码过于频繁"
-	message[TTIdValidError] = "TTKId格式不合法"
+	message[TTKIdValidError] = "TTKId格式不合法"
 }
 
 func MapErrMsg(errCode uint32) string {
