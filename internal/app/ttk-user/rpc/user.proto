@@ -109,13 +109,24 @@ message TTKIdPassLoginRequest {
   LoginCommon login_common = 3;
 }
 
-// Github登录
-message GitHubLoginRequest {
+
+// 第三方登录
+message ThirdPartyLoginRequest {
   string access_token = 1;
   // 设备信息
-  LoginCommon login_common = 3;
-
+  LoginCommon login_common = 2;
 }
+
+// 第三方登录备用接口
+message StandbyLoginRequest {
+  string third_party_id = 1;
+  string nickname = 2;
+  string Avatar_url = 3;
+  int64 LoginType = 4;
+  LoginCommon login_common = 5;
+}
+
+
 
 // 登录响应
 message LoginResponse {
@@ -168,7 +179,10 @@ service SsoService{
   rpc PhonePassLogin(PhonePassLoginRequest) returns(LoginResponse);
   rpc TTKIdPassLogin(TTKIdPassLoginRequest) returns (LoginResponse);
   rpc EmailPassLogin(EmailPassLoginRequest) returns (LoginResponse);
-  rpc GithubLogin(GitHubLoginRequest) returns (LoginResponse);
+  rpc GoogleLogin(ThirdPartyLoginRequest) returns (LoginResponse);
+  rpc FacebookLogin(ThirdPartyLoginRequest) returns (LoginResponse);
+  rpc GithubLogin(ThirdPartyLoginRequest) returns (LoginResponse);
+  rpc StandbyLogin(StandbyLoginRequest) returns (LoginResponse);
 
   // 注册
   rpc EmailRegister(EmailRegisterRequest) returns (RegisterResponse);

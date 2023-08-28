@@ -53,9 +53,17 @@ type TTkIDLoginRequest struct {
 	LoginCommon LoginCommon `json:"login_common"`
 }
 
-type GithubLoginRequest struct {
+type ThirdPartyLoginRequest struct {
 	Token       string      `json:"token"`
 	LoginCommon LoginCommon `json:"login_common"`
+}
+
+type StandbyLoginRequest struct {
+	ThirdPartyID string      `json:"thirdPartyId"`
+	Nickname     string      `json:"nickname"`
+	AvatarURL    string      `json:"avatarUrl"`
+	LoginType    int64       `json:"loginType"`
+	LoginCommon  LoginCommon `json:"login_common"`
 }
 
 type LoginResponse struct {

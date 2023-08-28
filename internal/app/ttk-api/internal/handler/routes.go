@@ -53,8 +53,23 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodPost,
+				Path:    "/sso/GoogleLogin",
+				Handler: sso.GoogleLoginHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/sso/FacebookLogin",
+				Handler: sso.FacebookLoginHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
 				Path:    "/sso/GithubLogin",
 				Handler: sso.GithubLoginHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/sso/StandbyLogin",
+				Handler: sso.StandbyLoginHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,

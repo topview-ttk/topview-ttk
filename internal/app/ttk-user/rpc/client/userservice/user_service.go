@@ -19,7 +19,6 @@ type (
 	GetUserInfoByTTKIdRequest        = user.GetUserInfoByTTKIdRequest
 	GetUserInfoByUidRequest          = user.GetUserInfoByUidRequest
 	GetUserInfoResponse              = user.GetUserInfoResponse
-	GitHubLoginRequest               = user.GitHubLoginRequest
 	LoginCommon                      = user.LoginCommon
 	LoginResponse                    = user.LoginResponse
 	PhonePassLoginRequest            = user.PhonePassLoginRequest
@@ -31,7 +30,9 @@ type (
 	SendEmailVerificationCodeRequest = user.SendEmailVerificationCodeRequest
 	SendPhoneVerificationCodeRequest = user.SendPhoneVerificationCodeRequest
 	SendVerificationCodeResponse     = user.SendVerificationCodeResponse
+	StandbyLoginRequest              = user.StandbyLoginRequest
 	TTKIdPassLoginRequest            = user.TTKIdPassLoginRequest
+	ThirdPartyLoginRequest           = user.ThirdPartyLoginRequest
 	UserInfo                         = user.UserInfo
 
 	UserService interface {

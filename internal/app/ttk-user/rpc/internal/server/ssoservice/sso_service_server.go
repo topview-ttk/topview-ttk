@@ -50,8 +50,8 @@ func (s *SsoServiceServer) PhonePassLogin(ctx context.Context, in *user.PhonePas
 }
 
 func (s *SsoServiceServer) TTKIdPassLogin(ctx context.Context, in *user.TTKIdPassLoginRequest) (*user.LoginResponse, error) {
-	l := ssoservicelogic.NewTTKIdPassLoginLogic(ctx, s.svcCtx)
-	return l.TTKIdPassLogin(in)
+	l := ssoservicelogic.NewTtkIdPassLoginLogic(ctx, s.svcCtx)
+	return l.TtkIdPassLogin(in)
 }
 
 func (s *SsoServiceServer) EmailPassLogin(ctx context.Context, in *user.EmailPassLoginRequest) (*user.LoginResponse, error) {
@@ -59,9 +59,24 @@ func (s *SsoServiceServer) EmailPassLogin(ctx context.Context, in *user.EmailPas
 	return l.EmailPassLogin(in)
 }
 
-func (s *SsoServiceServer) GithubLogin(ctx context.Context, in *user.GitHubLoginRequest) (*user.LoginResponse, error) {
+func (s *SsoServiceServer) GoogleLogin(ctx context.Context, in *user.ThirdPartyLoginRequest) (*user.LoginResponse, error) {
+	l := ssoservicelogic.NewGoogleLoginLogic(ctx, s.svcCtx)
+	return l.GoogleLogin(in)
+}
+
+func (s *SsoServiceServer) FacebookLogin(ctx context.Context, in *user.ThirdPartyLoginRequest) (*user.LoginResponse, error) {
+	l := ssoservicelogic.NewFacebookLoginLogic(ctx, s.svcCtx)
+	return l.FacebookLogin(in)
+}
+
+func (s *SsoServiceServer) GithubLogin(ctx context.Context, in *user.ThirdPartyLoginRequest) (*user.LoginResponse, error) {
 	l := ssoservicelogic.NewGithubLoginLogic(ctx, s.svcCtx)
 	return l.GithubLogin(in)
+}
+
+func (s *SsoServiceServer) StandbyLogin(ctx context.Context, in *user.StandbyLoginRequest) (*user.LoginResponse, error) {
+	l := ssoservicelogic.NewStandbyLoginLogic(ctx, s.svcCtx)
+	return l.StandbyLogin(in)
 }
 
 // 注册

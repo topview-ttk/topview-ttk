@@ -13,28 +13,28 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type GithubLoginLogic struct {
+type FacebookLoginLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewGithubLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GithubLoginLogic {
-	return &GithubLoginLogic{
+func NewFacebookLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *FacebookLoginLogic {
+	return &FacebookLoginLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *GithubLoginLogic) GithubLogin(req *types.ThirdPartyLoginRequest) (resp *types.LoginResponse, err error) {
+func (l *FacebookLoginLogic) FacebookLogin(req *types.ThirdPartyLoginRequest) (resp *types.LoginResponse, err error) {
 	var rpcLoginCommon = &user.LoginCommon{}
 	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-	rpcResp, err := l.svcCtx.SsoClient.GithubLogin(l.ctx, &user.ThirdPartyLoginRequest{
+	rpcResp, err := l.svcCtx.SsoClient.FacebookLogin(l.ctx, &user.ThirdPartyLoginRequest{
 		AccessToken: req.Token,
 		LoginCommon: rpcLoginCommon,
 	})
@@ -49,5 +49,4 @@ func (l *GithubLoginLogic) GithubLogin(req *types.ThirdPartyLoginRequest) (resp 
 		Token:        t,
 		TokenExpires: token.TokenExpires.Nanoseconds(),
 	}, err
-
 }
