@@ -13,29 +13,27 @@ import (
 )
 
 type (
-	EmailPassLoginRequest              = user.EmailPassLoginRequest
-	EmailRegisterRequest               = user.EmailRegisterRequest
-	EmailVerifyCodeLoginRequest        = user.EmailVerifyCodeLoginRequest
-	GetUserInfoByTTKIdRequest          = user.GetUserInfoByTTKIdRequest
-	GetUserInfoByUidRequest            = user.GetUserInfoByUidRequest
-	GetUserInfoListByRangeNameRequest  = user.GetUserInfoListByRangeNameRequest
-	GetUserInfoListByRangeNameResponse = user.GetUserInfoListByRangeNameResponse
-	GetUserInfoResponse                = user.GetUserInfoResponse
-	GitHubLoginRequest                 = user.GitHubLoginRequest
-	LoginCommon                        = user.LoginCommon
-	LoginResponse                      = user.LoginResponse
-	Page                               = user.Page
-	PhonePassLoginRequest              = user.PhonePassLoginRequest
-	PhoneRegisterRequest               = user.PhoneRegisterRequest
-	PhoneVerifyCodeLoginRequest        = user.PhoneVerifyCodeLoginRequest
-	RefreshTokenRequest                = user.RefreshTokenRequest
-	RefreshTokenResponse               = user.RefreshTokenResponse
-	RegisterResponse                   = user.RegisterResponse
-	SendEmailVerificationCodeRequest   = user.SendEmailVerificationCodeRequest
-	SendPhoneVerificationCodeRequest   = user.SendPhoneVerificationCodeRequest
-	SendVerificationCodeResponse       = user.SendVerificationCodeResponse
-	TTKIdPassLoginRequest              = user.TTKIdPassLoginRequest
-	UserInfo                           = user.UserInfo
+	EmailPassLoginRequest            = user.EmailPassLoginRequest
+	EmailRegisterRequest             = user.EmailRegisterRequest
+	EmailVerifyCodeLoginRequest      = user.EmailVerifyCodeLoginRequest
+	GetUserInfoByTTKIdRequest        = user.GetUserInfoByTTKIdRequest
+	GetUserInfoByUidRequest          = user.GetUserInfoByUidRequest
+	GetUserInfoResponse              = user.GetUserInfoResponse
+	LoginCommon                      = user.LoginCommon
+	LoginResponse                    = user.LoginResponse
+	PhonePassLoginRequest            = user.PhonePassLoginRequest
+	PhoneRegisterRequest             = user.PhoneRegisterRequest
+	PhoneVerifyCodeLoginRequest      = user.PhoneVerifyCodeLoginRequest
+	RefreshTokenRequest              = user.RefreshTokenRequest
+	RefreshTokenResponse             = user.RefreshTokenResponse
+	RegisterResponse                 = user.RegisterResponse
+	SendEmailVerificationCodeRequest = user.SendEmailVerificationCodeRequest
+	SendPhoneVerificationCodeRequest = user.SendPhoneVerificationCodeRequest
+	SendVerificationCodeResponse     = user.SendVerificationCodeResponse
+	StandbyLoginRequest              = user.StandbyLoginRequest
+	TTKIdPassLoginRequest            = user.TTKIdPassLoginRequest
+	ThirdPartyLoginRequest           = user.ThirdPartyLoginRequest
+	UserInfo                         = user.UserInfo
 
 	SsoService interface {
 		// 发送验证码
@@ -47,7 +45,10 @@ type (
 		PhonePassLogin(ctx context.Context, in *PhonePassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		TTKIdPassLogin(ctx context.Context, in *TTKIdPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		EmailPassLogin(ctx context.Context, in *EmailPassLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-		GithubLogin(ctx context.Context, in *GitHubLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		GoogleLogin(ctx context.Context, in *ThirdPartyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		FacebookLogin(ctx context.Context, in *ThirdPartyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		GithubLogin(ctx context.Context, in *ThirdPartyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		StandbyLogin(ctx context.Context, in *StandbyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		// 注册
 		EmailRegister(ctx context.Context, in *EmailRegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 		PhoneRegister(ctx context.Context, in *PhoneRegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
@@ -102,9 +103,24 @@ func (m *defaultSsoService) EmailPassLogin(ctx context.Context, in *EmailPassLog
 	return client.EmailPassLogin(ctx, in, opts...)
 }
 
-func (m *defaultSsoService) GithubLogin(ctx context.Context, in *GitHubLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+func (m *defaultSsoService) GoogleLogin(ctx context.Context, in *ThirdPartyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.GoogleLogin(ctx, in, opts...)
+}
+
+func (m *defaultSsoService) FacebookLogin(ctx context.Context, in *ThirdPartyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.FacebookLogin(ctx, in, opts...)
+}
+
+func (m *defaultSsoService) GithubLogin(ctx context.Context, in *ThirdPartyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	client := user.NewSsoServiceClient(m.cli.Conn())
 	return client.GithubLogin(ctx, in, opts...)
+}
+
+func (m *defaultSsoService) StandbyLogin(ctx context.Context, in *StandbyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.StandbyLogin(ctx, in, opts...)
 }
 
 // 注册

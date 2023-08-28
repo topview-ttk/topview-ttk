@@ -9,6 +9,7 @@ require (
 	github.com/alibabacloud-go/tea-utils/v2 v2.0.3
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/golang-jwt/jwt/v5 v5.0.0
+	github.com/jinzhu/copier v0.4.0
 	github.com/pkg/errors v0.9.1
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/tencentcloud/tencentcloud-sdk-go v3.0.233+incompatible
@@ -56,7 +57,6 @@ require (
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.2 // indirect
-	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/josharian/intern v1.0.0 // indirect

@@ -21,27 +21,30 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type GithubUserInfo struct {
-	Nickname  string `json:"nickname"`
+type GoogleUserInfo struct {
+	Nickname  string `json:"name"`
 	ID        int64  `json:"id"`
-	AvatarURL string `json:"avatar_url"`
+	AvatarURL string `json:"picture"`
+	Location  string `json:"locale"`
+	Email     string `json:"email"`
 }
 
-type GithubLoginLogic struct {
+type GoogleLoginLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewGithubLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GithubLoginLogic {
-	return &GithubLoginLogic{
+func NewGoogleLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GoogleLoginLogic {
+	return &GoogleLoginLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *GithubLoginLogic) GithubLogin(in *user.ThirdPartyLoginRequest) (*user.LoginResponse, error) {
+func (l *GoogleLoginLogic) GoogleLogin(in *user.ThirdPartyLoginRequest) (*user.LoginResponse, error) {
+
 	githubToken := in.GetAccessToken()
 
 	url := "https://api.github.com/user"

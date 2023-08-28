@@ -59,10 +59,18 @@ type (
 		Password    string      `json:"password"`
 		LoginCommon LoginCommon `json:"login_common"`
 	}
-	// GitHub登录
-	GithubLoginRequest {
+	// 第三方登录
+	ThirdPartyLoginRequest {
 		Token       string      `json:"token"`
 		LoginCommon LoginCommon `json:"login_common"`
+	}
+	// 第三方登录备用接口（本地请求数据，如何服务器无法请求uesrInfo，客户端直接传userInfo）
+	StandbyLoginRequest {
+		ThirdPartyID string      `json:"thirdPartyId"`
+		Nickname     string      `json:"nickname"`
+		AvatarURL    string      `json:"avatarUrl"`
+		LoginType    int64       `json:"loginType"`
+		LoginCommon  LoginCommon `json:"login_common"`
 	}
 
 	// 登录响应
@@ -139,9 +147,21 @@ service api_server {
 	@handler TtkidPassLogin
 	post /sso/TTKIDPassLogin (TTkIDLoginRequest) returns (LoginResponse)
 
+	// Google登录
+	@handler GoogleLogin
+	post /sso/GoogleLogin (ThirdPartyLoginRequest) returns (LoginResponse)
+
+	// Facebook登录
+	@handler FacebookLogin
+	post /sso/FacebookLogin (ThirdPartyLoginRequest) returns (LoginResponse)
+
 	// GitHub登录
 	@handler GithubLogin
-	post /sso/GithubLogin (GithubLoginRequest) returns (LoginResponse)
+	post /sso/GithubLogin (ThirdPartyLoginRequest) returns (LoginResponse)
+
+	// 备用接口登录
+	@handler StandbyLogin
+	post /sso/StandbyLogin (StandbyLoginRequest) returns (LoginResponse)
 	////////////////////////////////
 
 	//////////////////////////////// register
@@ -193,7 +213,7 @@ service api_server {
 	@handler GetUserInfoByUid
 	get /user/info (GetUserInfoByUidRequest) returns (GetUserInfoResponse)
 
-	@handler GetUserInfoByTTKId
+	@handler GetUserInfoByTtkId
 	get /user/infoByTTKId (GetUserInfoByTTKIdRequest) returns (GetUserInfoResponse)
 }
 

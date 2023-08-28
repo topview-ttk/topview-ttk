@@ -13,30 +13,33 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type GithubLoginLogic struct {
+type StandbyLoginLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewGithubLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GithubLoginLogic {
-	return &GithubLoginLogic{
+func NewStandbyLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *StandbyLoginLogic {
+	return &StandbyLoginLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *GithubLoginLogic) GithubLogin(req *types.ThirdPartyLoginRequest) (resp *types.LoginResponse, err error) {
+func (l *StandbyLoginLogic) StandbyLogin(req *types.StandbyLoginRequest) (resp *types.LoginResponse, err error) {
 	var rpcLoginCommon = &user.LoginCommon{}
 	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-	rpcResp, err := l.svcCtx.SsoClient.GithubLogin(l.ctx, &user.ThirdPartyLoginRequest{
-		AccessToken: req.Token,
-		LoginCommon: rpcLoginCommon,
+	rpcResp, err := l.svcCtx.SsoClient.StandbyLogin(l.ctx, &user.StandbyLoginRequest{
+		ThirdPartyId: req.ThirdPartyID,
+		Nickname:     req.Nickname,
+		AvatarUrl:    req.AvatarURL,
+		LoginCommon:  rpcLoginCommon,
+		LoginType:    req.LoginType,
 	})
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
@@ -49,5 +52,4 @@ func (l *GithubLoginLogic) GithubLogin(req *types.ThirdPartyLoginRequest) (resp 
 		Token:        t,
 		TokenExpires: token.TokenExpires.Nanoseconds(),
 	}, err
-
 }
