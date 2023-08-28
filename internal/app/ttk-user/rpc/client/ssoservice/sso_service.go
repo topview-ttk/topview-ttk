@@ -13,26 +13,29 @@ import (
 )
 
 type (
-	EmailPassLoginRequest            = user.EmailPassLoginRequest
-	EmailRegisterRequest             = user.EmailRegisterRequest
-	EmailVerifyCodeLoginRequest      = user.EmailVerifyCodeLoginRequest
-	GetUserInfoByTTKIdRequest        = user.GetUserInfoByTTKIdRequest
-	GetUserInfoByUidRequest          = user.GetUserInfoByUidRequest
-	GetUserInfoResponse              = user.GetUserInfoResponse
-	GitHubLoginRequest               = user.GitHubLoginRequest
-	LoginCommon                      = user.LoginCommon
-	LoginResponse                    = user.LoginResponse
-	PhonePassLoginRequest            = user.PhonePassLoginRequest
-	PhoneRegisterRequest             = user.PhoneRegisterRequest
-	PhoneVerifyCodeLoginRequest      = user.PhoneVerifyCodeLoginRequest
-	RefreshTokenRequest              = user.RefreshTokenRequest
-	RefreshTokenResponse             = user.RefreshTokenResponse
-	RegisterResponse                 = user.RegisterResponse
-	SendEmailVerificationCodeRequest = user.SendEmailVerificationCodeRequest
-	SendPhoneVerificationCodeRequest = user.SendPhoneVerificationCodeRequest
-	SendVerificationCodeResponse     = user.SendVerificationCodeResponse
-	TTKIdPassLoginRequest            = user.TTKIdPassLoginRequest
-	UserInfo                         = user.UserInfo
+	EmailPassLoginRequest              = user.EmailPassLoginRequest
+	EmailRegisterRequest               = user.EmailRegisterRequest
+	EmailVerifyCodeLoginRequest        = user.EmailVerifyCodeLoginRequest
+	GetUserInfoByTTKIdRequest          = user.GetUserInfoByTTKIdRequest
+	GetUserInfoByUidRequest            = user.GetUserInfoByUidRequest
+	GetUserInfoListByRangeNameRequest  = user.GetUserInfoListByRangeNameRequest
+	GetUserInfoListByRangeNameResponse = user.GetUserInfoListByRangeNameResponse
+	GetUserInfoResponse                = user.GetUserInfoResponse
+	GitHubLoginRequest                 = user.GitHubLoginRequest
+	LoginCommon                        = user.LoginCommon
+	LoginResponse                      = user.LoginResponse
+	Page                               = user.Page
+	PhonePassLoginRequest              = user.PhonePassLoginRequest
+	PhoneRegisterRequest               = user.PhoneRegisterRequest
+	PhoneVerifyCodeLoginRequest        = user.PhoneVerifyCodeLoginRequest
+	RefreshTokenRequest                = user.RefreshTokenRequest
+	RefreshTokenResponse               = user.RefreshTokenResponse
+	RegisterResponse                   = user.RegisterResponse
+	SendEmailVerificationCodeRequest   = user.SendEmailVerificationCodeRequest
+	SendPhoneVerificationCodeRequest   = user.SendPhoneVerificationCodeRequest
+	SendVerificationCodeResponse       = user.SendVerificationCodeResponse
+	TTKIdPassLoginRequest              = user.TTKIdPassLoginRequest
+	UserInfo                           = user.UserInfo
 
 	SsoService interface {
 		// 发送验证码

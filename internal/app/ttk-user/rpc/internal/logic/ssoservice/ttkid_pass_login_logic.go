@@ -14,29 +14,29 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type TtkIdPassLoginLogic struct {
+type TTKIdPassLoginLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewTtkIdPassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TtkIdPassLoginLogic {
-	return &TtkIdPassLoginLogic{
+func NewTTKIdPassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *TTKIdPassLoginLogic {
+	return &TTKIdPassLoginLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *TtkIdPassLoginLogic) TtkIdPassLogin(in *user.TTKIdPassLoginRequest) (*user.LoginResponse, error) {
-	Ttkid := in.GetTtkId()
+func (l *TTKIdPassLoginLogic) TTKIdPassLogin(in *user.TTKIdPassLoginRequest) (*user.LoginResponse, error) {
+	TTKId := in.GetTtkId()
 	var userCredentials *model.TtkUserCredentials
 	var err error
 
-	if !util.ValidateTtkId(Ttkid) {
+	if !util.ValidateTtkId(TTKId) {
 		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.TTKIdValidError), "TTKId格式错误")
 	}
-	userCredentials, err = l.svcCtx.TtkUserInfoModel.FindUserCredentialsByTtkId(l.ctx, Ttkid)
+	userCredentials, err = l.svcCtx.TtkUserInfoModel.FindUserCredentialsByTtkId(l.ctx, TTKId)
 
 	if err != nil && errors.Is(err, sqlc.ErrNotFound) {
 		return nil, errors.Wrapf(ttkerr.NewErrCode(ttkerr.PassportError), "TTKId或者密码错误")
