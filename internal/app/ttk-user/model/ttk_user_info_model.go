@@ -29,6 +29,7 @@ type (
 		FindUserCredentialsByEmail(ctx context.Context, email string) (*TtkUserCredentials, error)
 		FindUserCredentialsByTtkId(ctx context.Context, email string) (*TtkUserCredentials, error)
 		FindUserCredentialsByPhone(ctx context.Context, email string) (*TtkUserCredentials, error)
+		FindListByRangeName(ctx context.Context, data *FindUserList) ([]*TtkUserInfo, error)
 		TransSaveCtx(ctx context.Context, session sqlx.Session, data *TtkUserInfo) (sql.Result, error)
 	}
 
@@ -40,6 +41,12 @@ type (
 
 	customTtkUserInfoModel struct {
 		*defaultTtkUserInfoModel
+	}
+
+	FindUserList struct {
+		RangeName string
+		Limit     int
+		Offset    int
 	}
 )
 
@@ -119,6 +126,19 @@ func (m *customTtkUserInfoModel) FindUserCredentialsByPhone(ctx context.Context,
 	switch err {
 	case nil:
 		return &resp, nil
+	case sqlc.ErrNotFound:
+		return nil, ErrNotFound
+	default:
+		return nil, err
+	}
+}
+
+func (m *customTtkUserInfoModel) FindListByRangeName(ctx context.Context, data *FindUserList) ([]*TtkUserInfo, error) {
+	var resp []*TtkUserInfo
+	err := m.QueryRowsNoCacheCtx(ctx, &resp, fmt.Sprintf("select %s from %s WHERE nick_name COLLATE utf8_general_ci LIKE CONCAT('%%', ? , '%%') OR ttk_id COLLATE utf8_general_ci LIKE CONCAT('%%', ? , '%%') LIMIT ? OFFSET ?", ttkUserInfoRows, m.table), data.RangeName, data.RangeName, data.Limit, data.Offset)
+	switch err {
+	case nil:
+		return resp, nil
 	case sqlc.ErrNotFound:
 		return nil, ErrNotFound
 	default:

@@ -31,3 +31,13 @@ func (s *UserServiceServer) GetUserInfoByTTKId(ctx context.Context, in *user.Get
 	l := userservicelogic.NewGetUserInfoByTTKIdLogic(ctx, s.svcCtx)
 	return l.GetUserInfoByTTKId(in)
 }
+
+func (s *UserServiceServer) GetUserSelfInfo(ctx context.Context, in *user.GetUserInfoByUidRequest) (*user.GetUserInfoResponse, error) {
+	l := userservicelogic.NewGetUserSelfInfoLogic(ctx, s.svcCtx)
+	return l.GetUserSelfInfo(in)
+}
+
+func (s *UserServiceServer) GetUserInfoListByRangeName(ctx context.Context, in *user.GetUserInfoListByRangeNameRequest) (*user.GetUserInfoListByRangeNameResponse, error) {
+	l := userservicelogic.NewGetUserInfoListByRangeNameLogic(ctx, s.svcCtx)
+	return l.GetUserInfoListByRangeName(in)
+}

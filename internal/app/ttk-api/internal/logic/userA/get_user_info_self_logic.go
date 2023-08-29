@@ -2,8 +2,11 @@ package userA
 
 import (
 	"context"
+	"encoding/json"
+	"github.com/jinzhu/copier"
 	"topview-ttk/internal/app/ttk-api/internal/svc"
 	"topview-ttk/internal/app/ttk-api/internal/types"
+	"topview-ttk/internal/app/ttk-user/rpc/user"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -23,9 +26,15 @@ func NewGetUserInfoSelfLogic(ctx context.Context, svcCtx *svc.ServiceContext) *G
 }
 
 func (l *GetUserInfoSelfLogic) GetUserInfoSelf() (resp *types.GetUserSelfResponse, err error) {
-	uid := l.ctx.Value("Uid")
-	if _, ok := uid.(int64); ok {
+	uid, _ := l.ctx.Value("Uid").(json.Number).Int64()
+	rpcResp, err := l.svcCtx.UserClient.GetUserSelfInfo(l.ctx, &user.GetUserInfoByUidRequest{Uid: uid})
+	if err != nil {
+		return nil, err
 	}
-	// TODO 获取用户个人信息
-	return
+	var u = types.UserInfo{}
+	err = copier.Copy(&u, rpcResp.UserInfo)
+	if err != nil {
+		return nil, err
+	}
+	return &types.GetUserSelfResponse{UserInfo: u}, nil
 }
