@@ -50,8 +50,8 @@ func (s *SsoServiceServer) PhonePassLogin(ctx context.Context, in *user.PhonePas
 }
 
 func (s *SsoServiceServer) TTKIdPassLogin(ctx context.Context, in *user.TTKIdPassLoginRequest) (*user.LoginResponse, error) {
-	l := ssoservicelogic.NewTtkIdPassLoginLogic(ctx, s.svcCtx)
-	return l.TtkIdPassLogin(in)
+	l := ssoservicelogic.NewTTKIdPassLoginLogic(ctx, s.svcCtx)
+	return l.TTKIdPassLogin(in)
 }
 
 func (s *SsoServiceServer) EmailPassLogin(ctx context.Context, in *user.EmailPassLoginRequest) (*user.LoginResponse, error) {

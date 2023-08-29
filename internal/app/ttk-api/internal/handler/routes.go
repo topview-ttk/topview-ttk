@@ -3,7 +3,6 @@ package handler
 
 import (
 	"net/http"
-	"topview-ttk/internal/pkg/token"
 
 	sso "topview-ttk/internal/app/ttk-api/internal/handler/sso"
 	user "topview-ttk/internal/app/ttk-api/internal/handler/user"
@@ -100,7 +99,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodGet,
 				Path:    "/user/infoByTTKId",
-				Handler: user.GetUserInfoByTTKIdHandler(serverCtx),
+				Handler: user.GetUserInfoByTtkIdHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/v1"),
@@ -114,7 +113,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: userA.GetUserInfoSelfHandler(serverCtx),
 			},
 		},
-		rest.WithJwt(token.AccessSecret),
+		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
 }
