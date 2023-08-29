@@ -13,31 +13,36 @@ import (
 )
 
 type (
-	EmailPassLoginRequest            = user.EmailPassLoginRequest
-	EmailRegisterRequest             = user.EmailRegisterRequest
-	EmailVerifyCodeLoginRequest      = user.EmailVerifyCodeLoginRequest
-	GetUserInfoByTTKIdRequest        = user.GetUserInfoByTTKIdRequest
-	GetUserInfoByUidRequest          = user.GetUserInfoByUidRequest
-	GetUserInfoResponse              = user.GetUserInfoResponse
-	LoginCommon                      = user.LoginCommon
-	LoginResponse                    = user.LoginResponse
-	PhonePassLoginRequest            = user.PhonePassLoginRequest
-	PhoneRegisterRequest             = user.PhoneRegisterRequest
-	PhoneVerifyCodeLoginRequest      = user.PhoneVerifyCodeLoginRequest
-	RefreshTokenRequest              = user.RefreshTokenRequest
-	RefreshTokenResponse             = user.RefreshTokenResponse
-	RegisterResponse                 = user.RegisterResponse
-	SendEmailVerificationCodeRequest = user.SendEmailVerificationCodeRequest
-	SendPhoneVerificationCodeRequest = user.SendPhoneVerificationCodeRequest
-	SendVerificationCodeResponse     = user.SendVerificationCodeResponse
-	StandbyLoginRequest              = user.StandbyLoginRequest
-	TTKIdPassLoginRequest            = user.TTKIdPassLoginRequest
-	ThirdPartyLoginRequest           = user.ThirdPartyLoginRequest
-	UserInfo                         = user.UserInfo
+	EmailPassLoginRequest              = user.EmailPassLoginRequest
+	EmailRegisterRequest               = user.EmailRegisterRequest
+	EmailVerifyCodeLoginRequest        = user.EmailVerifyCodeLoginRequest
+	GetUserInfoByTTKIdRequest          = user.GetUserInfoByTTKIdRequest
+	GetUserInfoByUidRequest            = user.GetUserInfoByUidRequest
+	GetUserInfoListByRangeNameRequest  = user.GetUserInfoListByRangeNameRequest
+	GetUserInfoListByRangeNameResponse = user.GetUserInfoListByRangeNameResponse
+	GetUserInfoResponse                = user.GetUserInfoResponse
+	LoginCommon                        = user.LoginCommon
+	LoginResponse                      = user.LoginResponse
+	Page                               = user.Page
+	PhonePassLoginRequest              = user.PhonePassLoginRequest
+	PhoneRegisterRequest               = user.PhoneRegisterRequest
+	PhoneVerifyCodeLoginRequest        = user.PhoneVerifyCodeLoginRequest
+	RefreshTokenRequest                = user.RefreshTokenRequest
+	RefreshTokenResponse               = user.RefreshTokenResponse
+	RegisterResponse                   = user.RegisterResponse
+	SendEmailVerificationCodeRequest   = user.SendEmailVerificationCodeRequest
+	SendPhoneVerificationCodeRequest   = user.SendPhoneVerificationCodeRequest
+	SendVerificationCodeResponse       = user.SendVerificationCodeResponse
+	StandbyLoginRequest                = user.StandbyLoginRequest
+	TTKIdPassLoginRequest              = user.TTKIdPassLoginRequest
+	ThirdPartyLoginRequest             = user.ThirdPartyLoginRequest
+	UserInfo                           = user.UserInfo
 
 	UserService interface {
 		GetUserInfoByUid(ctx context.Context, in *GetUserInfoByUidRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
 		GetUserInfoByTTKId(ctx context.Context, in *GetUserInfoByTTKIdRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
+		GetUserSelfInfo(ctx context.Context, in *GetUserInfoByUidRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error)
+		GetUserInfoListByRangeName(ctx context.Context, in *GetUserInfoListByRangeNameRequest, opts ...grpc.CallOption) (*GetUserInfoListByRangeNameResponse, error)
 	}
 
 	defaultUserService struct {
@@ -59,4 +64,14 @@ func (m *defaultUserService) GetUserInfoByUid(ctx context.Context, in *GetUserIn
 func (m *defaultUserService) GetUserInfoByTTKId(ctx context.Context, in *GetUserInfoByTTKIdRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
 	client := user.NewUserServiceClient(m.cli.Conn())
 	return client.GetUserInfoByTTKId(ctx, in, opts...)
+}
+
+func (m *defaultUserService) GetUserSelfInfo(ctx context.Context, in *GetUserInfoByUidRequest, opts ...grpc.CallOption) (*GetUserInfoResponse, error) {
+	client := user.NewUserServiceClient(m.cli.Conn())
+	return client.GetUserSelfInfo(ctx, in, opts...)
+}
+
+func (m *defaultUserService) GetUserInfoListByRangeName(ctx context.Context, in *GetUserInfoListByRangeNameRequest, opts ...grpc.CallOption) (*GetUserInfoListByRangeNameResponse, error) {
+	client := user.NewUserServiceClient(m.cli.Conn())
+	return client.GetUserInfoListByRangeName(ctx, in, opts...)
 }
