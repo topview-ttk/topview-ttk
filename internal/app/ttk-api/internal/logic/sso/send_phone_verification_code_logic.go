@@ -25,10 +25,11 @@ func NewSendPhoneVerificationCodeLogic(ctx context.Context, svcCtx *svc.ServiceC
 }
 
 func (l *SendPhoneVerificationCodeLogic) SendPhoneVerificationCode(req *types.SendPhoneVerificationCodeRequest) (resp *types.SendVerificationCodeResponse, err error) {
+	var rpcClientInfo = &user.ClientInfo{}
+
 	_, err = l.svcCtx.SsoClient.SendPhoneVerificationCode(l.ctx, &user.SendPhoneVerificationCodeRequest{
 		Phone:      req.Phone,
-		DeviceInfo: req.DeviceInfo,
-		ClientInfo: req.ClientInfo,
+		ClientInfo: rpcClientInfo,
 	})
 
 	if err != nil {

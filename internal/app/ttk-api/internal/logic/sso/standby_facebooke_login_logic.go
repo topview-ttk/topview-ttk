@@ -4,41 +4,43 @@ import (
 	"context"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
-	"topview-ttk/internal/app/ttk-user/rpc/user"
-	"topview-ttk/internal/pkg/token"
-
 	"topview-ttk/internal/app/ttk-api/internal/svc"
 	"topview-ttk/internal/app/ttk-api/internal/types"
+	"topview-ttk/internal/app/ttk-user/rpc/user"
+	"topview-ttk/internal/pkg/token"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type EmailPassLoginLogic struct {
+type StandbyFacebookeLoginLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewEmailPassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *EmailPassLoginLogic {
-	return &EmailPassLoginLogic{
+func NewStandbyFacebookeLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *StandbyFacebookeLoginLogic {
+	return &StandbyFacebookeLoginLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *EmailPassLoginLogic) EmailPassLogin(req *types.EmailLoginRequest) (resp *types.LoginResponse, err error) {
+func (l *StandbyFacebookeLoginLogic) StandbyFacebookeLogin(req *types.StandbyLoginRequest) (resp *types.LoginResponse, err error) {
+
 	var rpcClientInfo = &user.ClientInfo{}
+	var rpcStandbyUserInfo = &user.StandbyUserInfo{}
+
 	err = copier.Copy(rpcClientInfo, &req.ClientInfo)
+	err = copier.Copy(rpcStandbyUserInfo, &req.StandbyUserInfo)
+
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-	rpcResp, err := l.svcCtx.SsoClient.EmailPassLogin(l.ctx, &user.EmailPassLoginRequest{
-		Email:      req.Email,
-		Pass:       req.Password,
-		ClientInfo: rpcClientInfo,
+	rpcResp, err := l.svcCtx.SsoClient.StandbyFacebookLogin(l.ctx, &user.StandbyLoginRequest{
+		StandbyInfo: rpcStandbyUserInfo,
+		ClientInfo:  rpcClientInfo,
 	})
-
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}

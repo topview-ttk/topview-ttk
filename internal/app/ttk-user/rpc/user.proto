@@ -58,19 +58,13 @@ service UserService {
 // 发送手机验证码
 message SendPhoneVerificationCodeRequest {
   string phone = 1;
-  // 设备信息
-  string device_info = 2;
-  // 客户端版本
-  string client_info = 3;
+  ClientInfo clientInfo = 2;
 }
 
 // 发送邮箱验证码
 message SendEmailVerificationCodeRequest {
   string email = 1;
-  // 设备信息
-  string device_info = 2;
-  // 客户端版本
-  string client_info = 3;
+  ClientInfo clientInfo = 2;
 }
 
 // 发送验证码响应
@@ -81,34 +75,39 @@ message SendVerificationCodeResponse {
 
 
 // 登录=====
-message LoginCommon {
-  string registration_source = 1;
-  string registration_ip = 2;
-  // 设备信息
-  string device_info = 3;
-  // 客户端版本
-  string client_info = 4;
+message ClientInfo {
+  string device_info = 1;
+  string osInfo = 2;
+  string clientVersion = 3;
+  string loginIp = 4;
+}
+
+message StandbyUserInfo {
+  string thirdPartyId = 1;
+  string nickname = 2;
+  string avatarUrl = 3;
+  string email = 4;
 }
 
 // 手机验证码登录
 message PhoneVerifyCodeLoginRequest {
   string phone = 1;
   string verification_code = 2;
-  LoginCommon login_common = 3;
+  ClientInfo clientInfo = 3;
 }
 
 // 邮箱验证码登录
 message EmailVerifyCodeLoginRequest {
   string email = 1;
   string verification_code = 2;
-  LoginCommon login_common = 3;
+  ClientInfo clientInfo = 3;
 }
 
 // 手机密码登录
 message PhonePassLoginRequest {
   string phone = 1;
   string pass = 2;
-  LoginCommon login_common = 3;
+  ClientInfo clientInfo = 3;
 
 }
 
@@ -116,14 +115,14 @@ message PhonePassLoginRequest {
 message EmailPassLoginRequest {
   string email = 1;
   string pass = 2;
-  LoginCommon login_common = 3;
+  ClientInfo clientInfo = 3;
 }
 
 // ttkId登录
 message TTKIdPassLoginRequest {
   string ttk_id = 1;
   string pass = 2;
-  LoginCommon login_common = 3;
+  ClientInfo clientInfo = 3;
 }
 
 
@@ -131,16 +130,13 @@ message TTKIdPassLoginRequest {
 message ThirdPartyLoginRequest {
   string access_token = 1;
   // 设备信息
-  LoginCommon login_common = 2;
+  ClientInfo clientInfo = 3;
 }
 
 // 第三方登录备用接口
 message StandbyLoginRequest {
-  string third_party_id = 1;
-  string nickname = 2;
-  string Avatar_url = 3;
-  int64 LoginType = 4;
-  LoginCommon login_common = 5;
+  StandbyUserInfo standbyInfo = 1;
+  ClientInfo clientInfo = 2;
 }
 
 
@@ -174,14 +170,11 @@ message RegisterResponse {
 
 message RefreshTokenRequest{
   string token = 1;
-  // 设备信息
-  string device_info = 2;
-  // 客户端版本
-  string client_info = 3;
+  ClientInfo clientInfo = 2;
 }
 
 message RefreshTokenResponse{
-  string ref_token = 3;
+  string ref_token = 1;
 }
 
 
@@ -199,7 +192,8 @@ service SsoService{
   rpc GoogleLogin(ThirdPartyLoginRequest) returns (LoginResponse);
   rpc FacebookLogin(ThirdPartyLoginRequest) returns (LoginResponse);
   rpc GithubLogin(ThirdPartyLoginRequest) returns (LoginResponse);
-  rpc StandbyLogin(StandbyLoginRequest) returns (LoginResponse);
+  rpc StandbyGoogleLogin(StandbyLoginRequest) returns (LoginResponse);
+  rpc StandbyFacebookLogin(StandbyLoginRequest) returns (LoginResponse);
 
   // 注册
   rpc EmailRegister(EmailRegisterRequest) returns (RegisterResponse);

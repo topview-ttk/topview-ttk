@@ -13,6 +13,7 @@ import (
 )
 
 type (
+	ClientInfo                         = user.ClientInfo
 	EmailPassLoginRequest              = user.EmailPassLoginRequest
 	EmailRegisterRequest               = user.EmailRegisterRequest
 	EmailVerifyCodeLoginRequest        = user.EmailVerifyCodeLoginRequest
@@ -21,7 +22,6 @@ type (
 	GetUserInfoListByRangeNameRequest  = user.GetUserInfoListByRangeNameRequest
 	GetUserInfoListByRangeNameResponse = user.GetUserInfoListByRangeNameResponse
 	GetUserInfoResponse                = user.GetUserInfoResponse
-	LoginCommon                        = user.LoginCommon
 	LoginResponse                      = user.LoginResponse
 	Page                               = user.Page
 	PhonePassLoginRequest              = user.PhonePassLoginRequest
@@ -34,6 +34,7 @@ type (
 	SendPhoneVerificationCodeRequest   = user.SendPhoneVerificationCodeRequest
 	SendVerificationCodeResponse       = user.SendVerificationCodeResponse
 	StandbyLoginRequest                = user.StandbyLoginRequest
+	StandbyUserInfo                    = user.StandbyUserInfo
 	TTKIdPassLoginRequest              = user.TTKIdPassLoginRequest
 	ThirdPartyLoginRequest             = user.ThirdPartyLoginRequest
 	UserInfo                           = user.UserInfo
@@ -51,7 +52,8 @@ type (
 		GoogleLogin(ctx context.Context, in *ThirdPartyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		FacebookLogin(ctx context.Context, in *ThirdPartyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		GithubLogin(ctx context.Context, in *ThirdPartyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-		StandbyLogin(ctx context.Context, in *StandbyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		StandbyGoogleLogin(ctx context.Context, in *StandbyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
+		StandbyFacebookLogin(ctx context.Context, in *StandbyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
 		// 注册
 		EmailRegister(ctx context.Context, in *EmailRegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 		PhoneRegister(ctx context.Context, in *PhoneRegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
@@ -121,9 +123,14 @@ func (m *defaultSsoService) GithubLogin(ctx context.Context, in *ThirdPartyLogin
 	return client.GithubLogin(ctx, in, opts...)
 }
 
-func (m *defaultSsoService) StandbyLogin(ctx context.Context, in *StandbyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+func (m *defaultSsoService) StandbyGoogleLogin(ctx context.Context, in *StandbyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
 	client := user.NewSsoServiceClient(m.cli.Conn())
-	return client.StandbyLogin(ctx, in, opts...)
+	return client.StandbyGoogleLogin(ctx, in, opts...)
+}
+
+func (m *defaultSsoService) StandbyFacebookLogin(ctx context.Context, in *StandbyLoginRequest, opts ...grpc.CallOption) (*LoginResponse, error) {
+	client := user.NewSsoServiceClient(m.cli.Conn())
+	return client.StandbyFacebookLogin(ctx, in, opts...)
 }
 
 // 注册

@@ -13,6 +13,7 @@ import (
 )
 
 type (
+	ClientInfo                         = user.ClientInfo
 	EmailPassLoginRequest              = user.EmailPassLoginRequest
 	EmailRegisterRequest               = user.EmailRegisterRequest
 	EmailVerifyCodeLoginRequest        = user.EmailVerifyCodeLoginRequest
@@ -21,7 +22,6 @@ type (
 	GetUserInfoListByRangeNameRequest  = user.GetUserInfoListByRangeNameRequest
 	GetUserInfoListByRangeNameResponse = user.GetUserInfoListByRangeNameResponse
 	GetUserInfoResponse                = user.GetUserInfoResponse
-	LoginCommon                        = user.LoginCommon
 	LoginResponse                      = user.LoginResponse
 	Page                               = user.Page
 	PhonePassLoginRequest              = user.PhonePassLoginRequest
@@ -34,6 +34,7 @@ type (
 	SendPhoneVerificationCodeRequest   = user.SendPhoneVerificationCodeRequest
 	SendVerificationCodeResponse       = user.SendVerificationCodeResponse
 	StandbyLoginRequest                = user.StandbyLoginRequest
+	StandbyUserInfo                    = user.StandbyUserInfo
 	TTKIdPassLoginRequest              = user.TTKIdPassLoginRequest
 	ThirdPartyLoginRequest             = user.ThirdPartyLoginRequest
 	UserInfo                           = user.UserInfo

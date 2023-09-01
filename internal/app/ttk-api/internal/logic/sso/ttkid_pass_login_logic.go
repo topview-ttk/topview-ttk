@@ -28,22 +28,22 @@ func NewTtkidPassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Tt
 }
 
 func (l *TtkidPassLoginLogic) TtkidPassLogin(req *types.TTkIDLoginRequest) (resp *types.LoginResponse, err error) {
-	var rpcLoginCommon = &user.LoginCommon{}
-	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
+	var rpcClientInfo = &user.ClientInfo{}
+	err = copier.Copy(rpcClientInfo, &req.ClientInfo)
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
 	rpcResp, err := l.svcCtx.SsoClient.TTKIdPassLogin(l.ctx, &user.TTKIdPassLoginRequest{
-		TtkId:       req.TTkId,
-		Pass:        req.Password,
-		LoginCommon: rpcLoginCommon,
+		TtkId:      req.TTkId,
+		Pass:       req.Password,
+		ClientInfo: rpcClientInfo,
 	})
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-	t, err := token.GenerateVfToken(req.LoginCommon.DeviceInfo, req.LoginCommon.ClientInfo, rpcResp.Uid)
+	t, err := token.GenerateVfToken(req.ClientInfo.DeviceInfo, req.ClientInfo.OSVersion, rpcResp.Uid)
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}

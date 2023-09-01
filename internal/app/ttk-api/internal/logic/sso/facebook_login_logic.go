@@ -28,20 +28,20 @@ func NewFacebookLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Fac
 }
 
 func (l *FacebookLoginLogic) FacebookLogin(req *types.ThirdPartyLoginRequest) (resp *types.LoginResponse, err error) {
-	var rpcLoginCommon = &user.LoginCommon{}
-	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
+	var rpcClientInfo = &user.ClientInfo{}
+	err = copier.Copy(rpcClientInfo, &req.ClientInfo)
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
 	rpcResp, err := l.svcCtx.SsoClient.FacebookLogin(l.ctx, &user.ThirdPartyLoginRequest{
 		AccessToken: req.Token,
-		LoginCommon: rpcLoginCommon,
+		ClientInfo:  rpcClientInfo,
 	})
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-	t, err := token.GenerateVfToken(req.LoginCommon.DeviceInfo, req.LoginCommon.ClientInfo, rpcResp.Uid)
+	t, err := token.GenerateVfToken(req.ClientInfo.DeviceInfo, req.ClientInfo.OSVersion, rpcResp.Uid)
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}

@@ -9,7 +9,7 @@ import (
 	"topview-ttk/internal/app/ttk-api/internal/types"
 )
 
-func StandbyLoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
+func StandbyGoogleLoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var req types.StandbyLoginRequest
 		if err := httpx.Parse(r, &req); err != nil {
@@ -17,8 +17,8 @@ func StandbyLoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := sso.NewStandbyLoginLogic(r.Context(), svcCtx)
-		resp, err := l.StandbyLogin(&req)
+		l := sso.NewStandbyGoogleLoginLogic(r.Context(), svcCtx)
+		resp, err := l.StandbyGoogleLogin(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

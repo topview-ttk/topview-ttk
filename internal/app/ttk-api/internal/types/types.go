@@ -2,68 +2,70 @@
 package types
 
 type SendPhoneVerificationCodeRequest struct {
-	Phone      string `json:"phone"`
-	DeviceInfo string `json:"device_info"`
-	ClientInfo string `json:"client_info"`
+	Phone      string     `json:"phone"`
+	ClientInfo ClientInfo `json:"clientInfo"`
 }
 
 type SendEmailVerificationCodeRequest struct {
-	Email      string `json:"email"`
-	DeviceInfo string `json:"device_info"`
-	ClientInfo string `json:"client_info"`
+	Email      string     `json:"email"`
+	ClientInfo ClientInfo `json:"clientInfo"`
 }
 
 type SendVerificationCodeResponse struct {
 }
 
-type LoginCommon struct {
-	DeviceInfo         string `json:"device_info"`
-	ClientInfo         string `json:"client_info"`
-	RegistrationSource string `json:"registration_source"`
-	RegistrationIp     string `json:"registration_ip"`
+type ClientInfo struct {
+	DeviceInfo    string `json:"device_info"`   // 设备信息（eg: iphone13 pro）
+	OSVersion     string `json:"osInfo"`        // 操作系统版本信息 （eg：iOS 16.2.4）
+	ClientVersion string `json:"clientVersion"` // 客户端版本 （eg：TV_TikTok 0.4.12）
+	LoginIP       string `json:"loginIp"`       // 登录IP
+}
+
+type StandbyUserInfo struct {
+	ThirdPartyID string `json:"thirdPartyId"`
+	Nickname     string `json:"nickname"`
+	AvatarURL    string `json:"avatarUrl"`
+	Email        string `json:"email"`
 }
 
 type PhoneVerifyCodeLoginRequest struct {
-	Phone            string      `json:"phone"`
-	VerificationCode string      `json:"verification_code"`
-	LoginCommon      LoginCommon `json:"login_common"`
+	Phone            string     `json:"phone"`
+	VerificationCode string     `json:"verification_code"`
+	ClientInfo       ClientInfo `json:"clientInfo"`
 }
 
 type EmailVerifyCodeLoginRequest struct {
-	Email            string      `json:"email"`
-	VerificationCode string      `json:"verification_code"`
-	LoginCommon      LoginCommon `json:"login_common"`
+	Email            string     `json:"email"`
+	VerificationCode string     `json:"verification_code"`
+	ClientInfo       ClientInfo `json:"clientInfo"`
 }
 
 type PhonePassLoginRequest struct {
-	Phone       string      `json:"phone"`
-	Password    string      `json:"password"`
-	LoginCommon LoginCommon `json:"login_common"`
+	Phone      string     `json:"phone"`
+	Password   string     `json:"password"`
+	ClientInfo ClientInfo `json:"clientInfo"`
 }
 
 type EmailLoginRequest struct {
-	Email       string      `json:"email"`
-	Password    string      `json:"password"`
-	LoginCommon LoginCommon `json:"login_common"`
+	Email      string     `json:"email"`
+	Password   string     `json:"password"`
+	ClientInfo ClientInfo `json:"clientInfo"`
 }
 
 type TTkIDLoginRequest struct {
-	TTkId       string      `json:"ttk_id"`
-	Password    string      `json:"password"`
-	LoginCommon LoginCommon `json:"login_common"`
+	TTkId      string     `json:"ttk_id"`
+	Password   string     `json:"password"`
+	ClientInfo ClientInfo `json:"clientInfo"`
 }
 
 type ThirdPartyLoginRequest struct {
-	Token       string      `json:"token"`
-	LoginCommon LoginCommon `json:"login_common"`
+	Token      string     `json:"token"`
+	ClientInfo ClientInfo `json:"clientInfo"`
 }
 
 type StandbyLoginRequest struct {
-	ThirdPartyID string      `json:"thirdPartyId"`
-	Nickname     string      `json:"nickname"`
-	AvatarURL    string      `json:"avatarUrl"`
-	LoginType    int64       `json:"loginType"`
-	LoginCommon  LoginCommon `json:"login_common"`
+	StandbyUserInfo StandbyUserInfo `json:"standbyUserInfo"`
+	ClientInfo      ClientInfo      `json:"clientInfo"`
 }
 
 type LoginResponse struct {
@@ -87,7 +89,8 @@ type RegisterResponse struct {
 }
 
 type RefreshTokenRequest struct {
-	Token string `json:"token"`
+	Token      string     `json:"token"`
+	ClientInfo ClientInfo `json:"clientInfo"`
 }
 
 type RefreshTokenResponse struct {
@@ -115,6 +118,10 @@ type GetUserInfoByUidRequest struct {
 
 type GetUserInfoByTTKIdRequest struct {
 	TTKId int64 `form:"ttk_id"`
+}
+
+type GetUserSelfInfoRequest struct {
+	Token string `json:"token"`
 }
 
 type GetUserInfoResponse struct {

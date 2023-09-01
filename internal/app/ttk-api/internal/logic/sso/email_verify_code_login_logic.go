@@ -28,21 +28,21 @@ func NewEmailVerifyCodeLoginLogic(ctx context.Context, svcCtx *svc.ServiceContex
 }
 
 func (l *EmailVerifyCodeLoginLogic) EmailVerifyCodeLogin(req *types.EmailVerifyCodeLoginRequest) (resp *types.LoginResponse, err error) {
-	var rpcLoginCommon = &user.LoginCommon{}
-	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
+	var rpcClientInfo = &user.ClientInfo{}
+	err = copier.Copy(rpcClientInfo, &req.ClientInfo)
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
 	rpcResp, err := l.svcCtx.SsoClient.EmailVerifyCodeLogin(l.ctx, &user.EmailVerifyCodeLoginRequest{
 		Email:            req.Email,
 		VerificationCode: req.VerificationCode,
-		LoginCommon:      rpcLoginCommon,
+		ClientInfo:       rpcClientInfo,
 	})
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-	t, err := token.GenerateVfToken(req.LoginCommon.DeviceInfo, req.LoginCommon.ClientInfo, rpcResp.Uid)
+	t, err := token.GenerateVfToken(req.ClientInfo.DeviceInfo, req.ClientInfo.OSVersion, rpcResp.Uid)
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}

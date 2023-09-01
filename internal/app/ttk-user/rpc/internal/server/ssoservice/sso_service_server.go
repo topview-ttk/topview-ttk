@@ -74,9 +74,14 @@ func (s *SsoServiceServer) GithubLogin(ctx context.Context, in *user.ThirdPartyL
 	return l.GithubLogin(in)
 }
 
-func (s *SsoServiceServer) StandbyLogin(ctx context.Context, in *user.StandbyLoginRequest) (*user.LoginResponse, error) {
-	l := ssoservicelogic.NewStandbyLoginLogic(ctx, s.svcCtx)
-	return l.StandbyLogin(in)
+func (s *SsoServiceServer) StandbyGoogleLogin(ctx context.Context, in *user.StandbyLoginRequest) (*user.LoginResponse, error) {
+	l := ssoservicelogic.NewStandbyGoogleLoginLogic(ctx, s.svcCtx)
+	return l.StandbyGoogleLogin(in)
+}
+
+func (s *SsoServiceServer) StandbyFacebookLogin(ctx context.Context, in *user.StandbyLoginRequest) (*user.LoginResponse, error) {
+	l := ssoservicelogic.NewStandbyFacebookLoginLogic(ctx, s.svcCtx)
+	return l.StandbyFacebookLogin(in)
 }
 
 // 注册

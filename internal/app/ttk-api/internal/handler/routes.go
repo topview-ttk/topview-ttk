@@ -3,6 +3,7 @@ package handler
 
 import (
 	"net/http"
+	"topview-ttk/internal/pkg/token"
 
 	sso "topview-ttk/internal/app/ttk-api/internal/handler/sso"
 	user "topview-ttk/internal/app/ttk-api/internal/handler/user"
@@ -67,8 +68,13 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 			{
 				Method:  http.MethodPost,
-				Path:    "/sso/StandbyLogin",
-				Handler: sso.StandbyLoginHandler(serverCtx),
+				Path:    "/sso/StandbyGoogleLogin",
+				Handler: sso.StandbyGoogleLoginHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/sso/StandbyFacebookLogin",
+				Handler: sso.StandbyFacebookeLoginHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,
@@ -99,7 +105,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			{
 				Method:  http.MethodGet,
 				Path:    "/user/infoByTTKId",
-				Handler: user.GetUserInfoByTtkIdHandler(serverCtx),
+				Handler: user.GetUserInfoByTTKIdHandler(serverCtx),
 			},
 		},
 		rest.WithPrefix("/v1"),
@@ -113,7 +119,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: userA.GetUserInfoSelfHandler(serverCtx),
 			},
 		},
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithJwt(token.AccessSecret),
 		rest.WithPrefix("/v1"),
 	)
 }

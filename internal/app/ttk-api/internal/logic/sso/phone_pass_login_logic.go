@@ -28,22 +28,22 @@ func NewPhonePassLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Ph
 }
 
 func (l *PhonePassLoginLogic) PhonePassLogin(req *types.PhonePassLoginRequest) (resp *types.LoginResponse, err error) {
-	var rpcLoginCommon = &user.LoginCommon{}
-	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
+	var rpcClientInfo = &user.ClientInfo{}
+	err = copier.Copy(rpcClientInfo, &req.ClientInfo)
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
 	rpcResp, err := l.svcCtx.SsoClient.PhonePassLogin(l.ctx, &user.PhonePassLoginRequest{
-		Phone:       req.Phone,
-		Pass:        req.Password,
-		LoginCommon: rpcLoginCommon,
+		Phone:      req.Phone,
+		Pass:       req.Password,
+		ClientInfo: rpcClientInfo,
 	})
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-	t, err := token.GenerateVfToken(req.LoginCommon.DeviceInfo, req.LoginCommon.ClientInfo, rpcResp.Uid)
+	t, err := token.GenerateVfToken(req.ClientInfo.DeviceInfo, req.ClientInfo.OSVersion, rpcResp.Uid)
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}

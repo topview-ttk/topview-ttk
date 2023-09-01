@@ -13,38 +13,38 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type StandbyLoginLogic struct {
+type StandbyGoogleLoginLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 }
 
-func NewStandbyLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *StandbyLoginLogic {
-	return &StandbyLoginLogic{
+func NewStandbyGoogleLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *StandbyGoogleLoginLogic {
+	return &StandbyGoogleLoginLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
 	}
 }
 
-func (l *StandbyLoginLogic) StandbyLogin(req *types.StandbyLoginRequest) (resp *types.LoginResponse, err error) {
-	var rpcLoginCommon = &user.LoginCommon{}
-	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
+func (l *StandbyGoogleLoginLogic) StandbyGoogleLogin(req *types.StandbyLoginRequest) (resp *types.LoginResponse, err error) {
+	var rpcClientInfo = &user.ClientInfo{}
+	var rpcStandbyUserInfo = &user.StandbyUserInfo{}
+
+	err = copier.Copy(rpcClientInfo, &req.ClientInfo)
+	err = copier.Copy(rpcStandbyUserInfo, &req.StandbyUserInfo)
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-	rpcResp, err := l.svcCtx.SsoClient.StandbyLogin(l.ctx, &user.StandbyLoginRequest{
-		ThirdPartyId: req.ThirdPartyID,
-		Nickname:     req.Nickname,
-		AvatarUrl:    req.AvatarURL,
-		LoginCommon:  rpcLoginCommon,
-		LoginType:    req.LoginType,
+	rpcResp, err := l.svcCtx.SsoClient.StandbyFacebookLogin(l.ctx, &user.StandbyLoginRequest{
+		StandbyInfo: rpcStandbyUserInfo,
+		ClientInfo:  rpcClientInfo,
 	})
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-	t, err := token.GenerateVfToken(req.LoginCommon.DeviceInfo, req.LoginCommon.ClientInfo, rpcResp.Uid)
+	t, err := token.GenerateVfToken(req.ClientInfo.DeviceInfo, req.ClientInfo.OSVersion, rpcResp.Uid)
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}

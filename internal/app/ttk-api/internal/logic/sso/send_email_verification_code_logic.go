@@ -25,10 +25,11 @@ func NewSendEmailVerificationCodeLogic(ctx context.Context, svcCtx *svc.ServiceC
 }
 
 func (l *SendEmailVerificationCodeLogic) SendEmailVerificationCode(req *types.SendEmailVerificationCodeRequest) (resp *types.SendVerificationCodeResponse, err error) {
+	var rpcClientInfo = &user.ClientInfo{}
+
 	_, err = l.svcCtx.SsoClient.SendEmailVerificationCode(l.ctx, &user.SendEmailVerificationCodeRequest{
 		Email:      req.Email,
-		DeviceInfo: req.DeviceInfo,
-		ClientInfo: req.ClientInfo,
+		ClientInfo: rpcClientInfo,
 	})
 
 	if err != nil {

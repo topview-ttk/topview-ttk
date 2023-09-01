@@ -18,44 +18,33 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type StandbyUserInfo struct {
-	Nickname  string `json:"nickname"`
-	ID        int64  `json:"id"`
-	AvatarURL string `json:"avatar_url"`
-	LoginType int64  `json:"loginType"`
-}
-
-type StandbyLoginLogic struct {
+type StandbyFacebookLoginLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewStandbyLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *StandbyLoginLogic {
-	return &StandbyLoginLogic{
+func NewStandbyFacebookLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *StandbyFacebookLoginLogic {
+	return &StandbyFacebookLoginLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *StandbyLoginLogic) StandbyLogin(in *user.StandbyLoginRequest) (*user.LoginResponse, error) {
-	num_ID, _ := strconv.ParseInt(in.GetThirdPartyId(), 10, 64)
+func (l *StandbyFacebookLoginLogic) StandbyFacebookLogin(in *user.StandbyLoginRequest) (*user.LoginResponse, error) {
+	standbyInfo := in.GetStandbyInfo()
 
-	standbyUserInfo := StandbyUserInfo{
-		Nickname:  in.GetNickname(),
-		ID:        num_ID,
-		AvatarURL: in.GetAvatarUrl(),
-		LoginType: in.LoginType,
-	}
+	num_ID, _ := strconv.ParseInt(standbyInfo.GetThirdPartyId(), 10, 64)
 
-	id, err := l.svcCtx.TtkThirdPartyBindingModel.FindUserIdByThirdPartyIdAndType(l.ctx, standbyUserInfo.ID, "github")
+	id, err := l.svcCtx.TtkThirdPartyBindingModel.FindUserIdByThirdPartyIdAndType(l.ctx, num_ID, "google")
 
 	if err != nil && errors.Is(err, sqlc.ErrNotFound) {
 		if err := database.TransCtx(l.ctx, l.svcCtx.SqlConn, func(ctx context.Context, session sqlx.Session) error {
 			userInfo := login.CreateDefaultUserInfo()
-			userInfo.AvatarPath = standbyUserInfo.AvatarURL
-			userInfo.NickName = standbyUserInfo.Nickname
+			userInfo.AvatarPath = standbyInfo.GetAvatarUrl()
+			userInfo.NickName = standbyInfo.GetNickname()
+			userInfo.Email = standbyInfo.GetEmail()
 
 			_, err := l.svcCtx.TtkUserInfoModel.TransSaveCtx(ctx, session, userInfo)
 			if err != nil {
@@ -67,8 +56,8 @@ func (l *StandbyLoginLogic) StandbyLogin(in *user.StandbyLoginRequest) (*user.Lo
 			}
 			githubBinding := &model.TtkThirdPartyBinding{
 				UserId:                uid,
-				ThirdPartyBindingType: standbyUserInfo.LoginType,
-				ThirdPartyId:          strconv.FormatInt(standbyUserInfo.ID, 10),
+				ThirdPartyBindingType: 2,
+				ThirdPartyId:          standbyInfo.GetThirdPartyId(),
 				CreatedAt:             time.Time{},
 				UpdatedAt:             time.Now(),
 			}
@@ -87,6 +76,4 @@ func (l *StandbyLoginLogic) StandbyLogin(in *user.StandbyLoginRequest) (*user.Lo
 	return &user.LoginResponse{
 		Uid: id,
 	}, nil
-
-	return &user.LoginResponse{}, nil
 }

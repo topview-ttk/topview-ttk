@@ -28,8 +28,8 @@ func NewPhoneVerifyCodeLoginLogic(ctx context.Context, svcCtx *svc.ServiceContex
 }
 
 func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(req *types.PhoneVerifyCodeLoginRequest) (resp *types.LoginResponse, err error) {
-	var rpcLoginCommon = &user.LoginCommon{}
-	err = copier.Copy(rpcLoginCommon, &req.LoginCommon)
+	var rpcClientInfo = &user.ClientInfo{}
+	err = copier.Copy(rpcClientInfo, &req.ClientInfo)
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
@@ -37,13 +37,13 @@ func (l *PhoneVerifyCodeLoginLogic) PhoneVerifyCodeLogin(req *types.PhoneVerifyC
 	rpcResp, err := l.svcCtx.SsoClient.PhoneVerifyCodeLogin(l.ctx, &user.PhoneVerifyCodeLoginRequest{
 		Phone:            req.Phone,
 		VerificationCode: req.VerificationCode,
-		LoginCommon:      rpcLoginCommon,
+		ClientInfo:       rpcClientInfo,
 	})
 
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
-	t, err := token.GenerateVfToken(req.LoginCommon.DeviceInfo, req.LoginCommon.ClientInfo, rpcResp.Uid)
+	t, err := token.GenerateVfToken(req.ClientInfo.DeviceInfo, req.ClientInfo.OSVersion, rpcResp.Uid)
 	if err != nil {
 		return nil, errors.Wrapf(err, "req: %+v", req)
 	}
